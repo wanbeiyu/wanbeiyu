@@ -19,8 +19,8 @@ extern "C"
      */
     typedef struct wby_idac_t
     {
-        void (*sink)(struct wby_idac_t *idac, uint16_t value);
-        void (*source)(struct wby_idac_t *idac, uint16_t value);
+        void (*sink)(struct wby_idac_t *idac, uint8_t value);
+        void (*source)(struct wby_idac_t *idac, uint8_t value);
     } wby_idac_t;
 
     /**
@@ -99,16 +99,22 @@ extern "C"
 
     typedef struct wby_slidepad_t
     {
-        wby_idac_t *vertical;
-        wby_idac_t *horizontal;
+        wby_idac_t *_h;
+        wby_idac_t *_v;
     } wby_slidepad_t;
 
-#define WBY_SLIDEPAD_NEUTRAL ((uint16_t)32767)
-
-    void wby_slidepad_hold(wby_slidepad_t *sp, uint16_t x, uint16_t y);
-    void wby_slidepad_release(wby_slidepad_t *sp);
-    wby_slidepad_t *wby_slidepad_new(wby_idac_t *vertical, wby_idac_t *horizontal);
-    void wby_slidepad_delete(wby_slidepad_t *sp);
+#define WBY_SLIDEPAD_NEUTRAL ((uint8_t)128)
+#define wby_slidepad_hold(sp, x, y) ((sp) != NULL ? ((WBY_SLIDEPAD_NEUTRAL < (x) ? /* 129, 130, ..., 255; (x - WBY_SLIDEPAD_NEUTRAL) = 1, 2, ..., 127 */ (sp)->_h->sink((sp)->_h, (uint8_t)(((double)((x)-WBY_SLIDEPAD_NEUTRAL) / 127) * UINT8_MAX))   \
+                                                                                 : /* 0, 1, ..., 128; (WBY_SLIDEPAD_NEUTRAL - x) = 0, 1, ..., 128 */ (sp)->_h->source((sp)->_h, (uint8_t)(((double)(WBY_SLIDEPAD_NEUTRAL - (x)) / 128) * UINT8_MAX))), \
+                                                     (WBY_SLIDEPAD_NEUTRAL < (y) ? (sp)->_v->sink((sp)->_v, (uint8_t)(((double)((y)-WBY_SLIDEPAD_NEUTRAL) / 127) * UINT8_MAX))                                                                         \
+                                                                                 : (sp)->_v->source((sp)->_v, (uint8_t)(((double)(WBY_SLIDEPAD_NEUTRAL - (y)) / 128) * UINT8_MAX))))                                                                   \
+                                                  : (void)0)
+#define wby_slidepad_release(sp) ((sp) != NULL ? wby_slidepad_hold((sp), WBY_SLIDEPAD_NEUTRAL, WBY_SLIDEPAD_NEUTRAL) \
+                                               : (void)0)
+#define wby_slidepad_init(sp, h, v) (((sp) != NULL && (h) != NULL && (v) != NULL) ? ((sp)->_h = h,               \
+                                                                                     (sp)->_v = v,               \
+                                                                                     wby_slidepad_release((sp))) \
+                                                                                  : (void)0)
 
     typedef struct wby_touchscreen_t
     {

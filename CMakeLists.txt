@@ -5,7 +5,6 @@ set(CMAKE_C_STANDARD 99)
 
 include_directories(include)
 add_library(wanbeiyu STATIC
-            src/slidepad.c
             src/touchscreen.c)
 
 # Create test executable

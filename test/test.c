@@ -183,49 +183,49 @@ int test_slidepad(void)
 {
     int index = -1;
 
-    TestDAC *v = test_dac_new();
-    assert(v != NULL);
     TestDAC *h = test_dac_new();
     assert(h != NULL);
+    TestDAC *v = test_dac_new();
+    assert(v != NULL);
 
-    wby_slidepad_t *sp = wby_slidepad_new((wby_idac_t *)v, (wby_idac_t *)h);
-    assert(sp != NULL);
+    wby_slidepad_t sp;
+    wby_slidepad_init(&sp, (wby_idac_t *)h, (wby_idac_t *)v);
     assert(v->state == TEST_DAC_SOURCE && v->value == 0 &&
            h->state == TEST_DAC_SOURCE && h->value == 0);
 
-    wby_slidepad_hold(sp, 0, 0);
-    if (!(v->state == TEST_DAC_SOURCE && v->value == UINT16_MAX &&
-          h->state == TEST_DAC_SOURCE && h->value == UINT16_MAX))
+    wby_slidepad_hold(&sp, 0, 0);
+    if (!(v->state == TEST_DAC_SOURCE && v->value == UINT8_MAX &&
+          h->state == TEST_DAC_SOURCE && h->value == UINT8_MAX))
     {
         index = 0;
         goto cleanup;
     }
 
-    wby_slidepad_hold(sp, 0, UINT16_MAX);
-    if (!(v->state == TEST_DAC_SINK && v->value == UINT16_MAX &&
-          h->state == TEST_DAC_SOURCE && h->value == UINT16_MAX))
+    wby_slidepad_hold(&sp, 0, UINT8_MAX);
+    if (!(v->state == TEST_DAC_SINK && v->value == UINT8_MAX &&
+          h->state == TEST_DAC_SOURCE && h->value == UINT8_MAX))
     {
         index = 1;
         goto cleanup;
     }
 
-    wby_slidepad_hold(sp, UINT16_MAX, UINT16_MAX);
-    if (!(v->state == TEST_DAC_SINK && v->value == UINT16_MAX &&
-          h->state == TEST_DAC_SINK && h->value == UINT16_MAX))
+    wby_slidepad_hold(&sp, UINT8_MAX, UINT8_MAX);
+    if (!(v->state == TEST_DAC_SINK && v->value == UINT8_MAX &&
+          h->state == TEST_DAC_SINK && h->value == UINT8_MAX))
     {
         index = 2;
         goto cleanup;
     }
 
-    wby_slidepad_hold(sp, UINT16_MAX, 0);
-    if (!(v->state == TEST_DAC_SOURCE && v->value == UINT16_MAX &&
-          h->state == TEST_DAC_SINK && h->value == UINT16_MAX))
+    wby_slidepad_hold(&sp, UINT8_MAX, 0);
+    if (!(v->state == TEST_DAC_SOURCE && v->value == UINT8_MAX &&
+          h->state == TEST_DAC_SINK && h->value == UINT8_MAX))
     {
         index = 3;
         goto cleanup;
     }
 
-    wby_slidepad_release(sp);
+    wby_slidepad_release(&sp);
     if (!(v->state == TEST_DAC_SOURCE && v->value == 0 &&
           h->state == TEST_DAC_SOURCE && h->value == 0))
     {
@@ -234,7 +234,6 @@ int test_slidepad(void)
     }
 
 cleanup:
-    wby_slidepad_delete(sp);
     test_dac_delete(h);
     test_dac_delete(v);
 

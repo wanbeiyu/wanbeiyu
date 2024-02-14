@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(qingpi)
+project(wanbeiyu)
 set(CMAKE_C_STANDARD 99)
 
 include_directories(include)
-add_library(qingpi STATIC 
+add_library(wanbeiyu STATIC 
             src/button.c
             src/hat.c
             src/slidepad.c
@@ -12,4 +12,4 @@ add_library(qingpi STATIC
 
 # Create test executable
 add_executable(test test/test.c)
-target_link_libraries(test qingpi)
+target_link_libraries(test wanbeiyu)

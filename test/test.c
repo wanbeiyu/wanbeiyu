@@ -15,18 +15,18 @@ int test_button(void)
     TestGPIO *gpio = test_gpio_new();
     assert(gpio != NULL);
 
-    QpiButton *btn = qpi_button_new((QpiGeneralPurposeIOInterface *)gpio);
+    wby_button_t *btn = wby_button_new((wby_gpio_t *)gpio);
     assert(btn != NULL);
     assert(gpio->state == TEST_GPIO_HI_Z);
 
-    qpi_button_hold(btn);
+    wby_button_hold(btn);
     if (!(gpio->state == TEST_GPIO_LOW))
     {
         index = 0;
         goto cleanup;
     }
 
-    qpi_button_release(btn);
+    wby_button_release(btn);
     if (!(gpio->state == TEST_GPIO_HI_Z))
     {
         index = 1;
@@ -34,7 +34,7 @@ int test_button(void)
     }
 
 cleanup:
-    qpi_button_delete(btn);
+    wby_button_delete(btn);
     test_gpio_delete(gpio);
 
     return index;
@@ -46,32 +46,32 @@ int test_hat(void)
 
     TestGPIO *gpio_up = test_gpio_new();
     assert(gpio_up != NULL);
-    QpiButton *btn_up = qpi_button_new((QpiGeneralPurposeIOInterface *)gpio_up);
+    wby_button_t *btn_up = wby_button_new((wby_gpio_t *)gpio_up);
     assert(btn_up != NULL);
 
     TestGPIO *gpio_right = test_gpio_new();
     assert(gpio_right != NULL);
-    QpiButton *btn_right = qpi_button_new((QpiGeneralPurposeIOInterface *)gpio_right);
+    wby_button_t *btn_right = wby_button_new((wby_gpio_t *)gpio_right);
     assert(btn_right != NULL);
 
     TestGPIO *gpio_down = test_gpio_new();
     assert(gpio_down != NULL);
-    QpiButton *btn_down = qpi_button_new((QpiGeneralPurposeIOInterface *)gpio_down);
+    wby_button_t *btn_down = wby_button_new((wby_gpio_t *)gpio_down);
     assert(btn_down != NULL);
 
     TestGPIO *gpio_left = test_gpio_new();
     assert(gpio_left != NULL);
-    QpiButton *btn_left = qpi_button_new((QpiGeneralPurposeIOInterface *)gpio_left);
+    wby_button_t *btn_left = wby_button_new((wby_gpio_t *)gpio_left);
     assert(btn_left != NULL);
 
-    QpiHat *hat = qpi_hat_new(btn_up, btn_right, btn_down, btn_left);
+    wby_hat_t *hat = wby_hat_new(btn_up, btn_right, btn_down, btn_left);
     assert(hat != NULL);
     assert(gpio_up->state == TEST_GPIO_HI_Z &&
            gpio_right->state == TEST_GPIO_HI_Z &&
            gpio_down->state == TEST_GPIO_HI_Z &&
            gpio_left->state == TEST_GPIO_HI_Z);
 
-    qpi_hat_hold(hat, QPI_HAT_UP);
+    wby_hat_hold(hat, WBY_HAT_UP);
     if (!(gpio_up->state == TEST_GPIO_LOW &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -81,7 +81,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_hold(hat, QPI_HAT_UPRIGHT);
+    wby_hat_hold(hat, WBY_HAT_UPRIGHT);
     if (!(gpio_up->state == TEST_GPIO_LOW &&
           gpio_right->state == TEST_GPIO_LOW &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -91,7 +91,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_hold(hat, QPI_HAT_RIGHT);
+    wby_hat_hold(hat, WBY_HAT_RIGHT);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_LOW &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -101,7 +101,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_hold(hat, QPI_HAT_DOWNRIGHT);
+    wby_hat_hold(hat, WBY_HAT_DOWNRIGHT);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_LOW &&
           gpio_down->state == TEST_GPIO_LOW &&
@@ -111,7 +111,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_hold(hat, QPI_HAT_DOWN);
+    wby_hat_hold(hat, WBY_HAT_DOWN);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_LOW &&
@@ -121,7 +121,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_hold(hat, QPI_HAT_DOWNLEFT);
+    wby_hat_hold(hat, WBY_HAT_DOWNLEFT);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_LOW &&
@@ -131,7 +131,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_hold(hat, QPI_HAT_LEFT);
+    wby_hat_hold(hat, WBY_HAT_LEFT);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -141,7 +141,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_hold(hat, QPI_HAT_UPLEFT);
+    wby_hat_hold(hat, WBY_HAT_UPLEFT);
     if (!(gpio_up->state == TEST_GPIO_LOW &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -151,7 +151,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_hold(hat, QPI_HAT_NEUTRAL);
+    wby_hat_hold(hat, WBY_HAT_NEUTRAL);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -161,7 +161,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    qpi_hat_release(hat);
+    wby_hat_release(hat);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -172,14 +172,14 @@ int test_hat(void)
     }
 
 cleanup:
-    qpi_hat_delete(hat);
-    qpi_button_delete(btn_left);
+    wby_hat_delete(hat);
+    wby_button_delete(btn_left);
     test_gpio_delete(gpio_left);
-    qpi_button_delete(btn_down);
+    wby_button_delete(btn_down);
     test_gpio_delete(gpio_down);
-    qpi_button_delete(btn_right);
+    wby_button_delete(btn_right);
     test_gpio_delete(gpio_right);
-    qpi_button_delete(btn_up);
+    wby_button_delete(btn_up);
     test_gpio_delete(gpio_up);
 
     return index;
@@ -194,12 +194,12 @@ int test_slidepad(void)
     TestDAC *h = test_dac_new();
     assert(h != NULL);
 
-    QpiSlidePad *sp = qpi_slidepad_new((QpiCurrentDAConverterInterface *)v, (QpiCurrentDAConverterInterface *)h);
+    wby_slidepad_t *sp = wby_slidepad_new((wby_idac_t *)v, (wby_idac_t *)h);
     assert(sp != NULL);
     assert(v->state == TEST_DAC_SOURCE && v->value == 0 &&
            h->state == TEST_DAC_SOURCE && h->value == 0);
 
-    qpi_slidepad_hold(sp, 0, 0);
+    wby_slidepad_hold(sp, 0, 0);
     if (!(v->state == TEST_DAC_SOURCE && v->value == UINT16_MAX &&
           h->state == TEST_DAC_SOURCE && h->value == UINT16_MAX))
     {
@@ -207,7 +207,7 @@ int test_slidepad(void)
         goto cleanup;
     }
 
-    qpi_slidepad_hold(sp, 0, UINT16_MAX);
+    wby_slidepad_hold(sp, 0, UINT16_MAX);
     if (!(v->state == TEST_DAC_SINK && v->value == UINT16_MAX &&
           h->state == TEST_DAC_SOURCE && h->value == UINT16_MAX))
     {
@@ -215,7 +215,7 @@ int test_slidepad(void)
         goto cleanup;
     }
 
-    qpi_slidepad_hold(sp, UINT16_MAX, UINT16_MAX);
+    wby_slidepad_hold(sp, UINT16_MAX, UINT16_MAX);
     if (!(v->state == TEST_DAC_SINK && v->value == UINT16_MAX &&
           h->state == TEST_DAC_SINK && h->value == UINT16_MAX))
     {
@@ -223,7 +223,7 @@ int test_slidepad(void)
         goto cleanup;
     }
 
-    qpi_slidepad_hold(sp, UINT16_MAX, 0);
+    wby_slidepad_hold(sp, UINT16_MAX, 0);
     if (!(v->state == TEST_DAC_SOURCE && v->value == UINT16_MAX &&
           h->state == TEST_DAC_SINK && h->value == UINT16_MAX))
     {
@@ -231,7 +231,7 @@ int test_slidepad(void)
         goto cleanup;
     }
 
-    qpi_slidepad_release(sp);
+    wby_slidepad_release(sp);
     if (!(v->state == TEST_DAC_SOURCE && v->value == 0 &&
           h->state == TEST_DAC_SOURCE && h->value == 0))
     {
@@ -240,7 +240,7 @@ int test_slidepad(void)
     }
 
 cleanup:
-    qpi_slidepad_delete(sp);
+    wby_slidepad_delete(sp);
     test_dac_delete(h);
     test_dac_delete(v);
 
@@ -258,12 +258,12 @@ int test_touchscreen(void)
     TestSwitch *sw = test_switch_new();
     assert(sw != NULL);
 
-    QpiTouchScreen *ts = qpi_touchscreen_new((QpiDigitalPotentiometerInterface *)v, (QpiDigitalPotentiometerInterface *)h, (QpiSPSTSwitchInterface *)sw);
+    wby_touchscreen_t *ts = wby_touchscreen_new((wby_rdac_t *)v, (wby_rdac_t *)h, (wby_spst_switch_t *)sw);
     assert(ts != NULL);
     assert(v->state == TEST_DIGIPOT_SHUTDOWN && h->state == TEST_DIGIPOT_SHUTDOWN);
     assert(sw->state == TEST_SWITCH_OFF);
 
-    qpi_touchscreen_hold(ts, 0, 0);
+    wby_touchscreen_hold(ts, 0, 0);
     if (!(v->state == TEST_DIGIPOT_POWER_ON && v->position == 0 &&
           h->state == TEST_DIGIPOT_POWER_ON && h->position == 0 &&
           sw->state == TEST_SWITCH_ON))
@@ -272,7 +272,7 @@ int test_touchscreen(void)
         goto cleanup;
     }
 
-    qpi_touchscreen_hold(ts, 32767, 32767);
+    wby_touchscreen_hold(ts, 32767, 32767);
     if (!(v->state == TEST_DIGIPOT_POWER_ON && v->position == 32767 &&
           h->state == TEST_DIGIPOT_POWER_ON && h->position == 32767 &&
           sw->state == TEST_SWITCH_ON))
@@ -281,7 +281,7 @@ int test_touchscreen(void)
         goto cleanup;
     }
 
-    qpi_touchscreen_hold(ts, UINT16_MAX, UINT16_MAX);
+    wby_touchscreen_hold(ts, UINT16_MAX, UINT16_MAX);
     if (!(v->state == TEST_DIGIPOT_POWER_ON && v->position == UINT16_MAX &&
           h->state == TEST_DIGIPOT_POWER_ON && h->position == UINT16_MAX &&
           sw->state == TEST_SWITCH_ON))
@@ -290,7 +290,7 @@ int test_touchscreen(void)
         goto cleanup;
     }
 
-    qpi_touchscreen_release(ts);
+    wby_touchscreen_release(ts);
     if (!(v->state == TEST_DIGIPOT_SHUTDOWN && h->state == TEST_DIGIPOT_SHUTDOWN && sw->state == TEST_SWITCH_OFF))
     {
         index = 3;
@@ -298,7 +298,7 @@ int test_touchscreen(void)
     }
 
 cleanup:
-    qpi_touchscreen_delete(ts);
+    wby_touchscreen_delete(ts);
     test_switch_delete(sw);
     test_digipot_delete(h);
     test_digipot_delete(v);

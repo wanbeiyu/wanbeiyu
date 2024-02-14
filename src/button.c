@@ -2,52 +2,52 @@
 
 #include <stdlib.h>
 
-void qpi_button_hold(QpiButton *self)
+void wby_button_hold(wby_button_t *btn)
 {
-    if (self == NULL)
+    if (btn == NULL)
     {
         return;
     }
 
-    self->gpio->set_low(self->gpio);
+    btn->gpio->set_low(btn->gpio);
 }
 
-void qpi_button_release(QpiButton *self)
+void wby_button_release(wby_button_t *btn)
 {
-    if (self == NULL)
+    if (btn == NULL)
     {
         return;
     }
 
-    self->gpio->set_hi_z(self->gpio);
+    btn->gpio->set_hi_z(btn->gpio);
 }
 
-QpiButton *qpi_button_new(QpiGeneralPurposeIOInterface *gpio)
+wby_button_t *wby_button_new(wby_gpio_t *gpio)
 {
     if (gpio == NULL)
     {
         return NULL;
     }
 
-    QpiButton *self = (QpiButton *)malloc(sizeof(QpiButton));
-    if (self == NULL)
+    wby_button_t *btn = (wby_button_t *)malloc(sizeof(wby_button_t));
+    if (btn == NULL)
     {
         return NULL;
     }
 
-    self->gpio = gpio;
+    btn->gpio = gpio;
 
-    qpi_button_release(self);
+    wby_button_release(btn);
 
-    return self;
+    return btn;
 }
 
-void qpi_button_delete(QpiButton *self)
+void wby_button_delete(wby_button_t *btn)
 {
-    if (self == NULL)
+    if (btn == NULL)
     {
         return;
     }
 
-    free(self);
+    free(btn);
 }

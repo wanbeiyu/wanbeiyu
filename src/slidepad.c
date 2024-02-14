@@ -2,81 +2,81 @@
 
 #include <stdlib.h>
 
-void qpi_slidepad_hold(QpiSlidePad *self, uint16_t x, uint16_t y)
+void wby_slidepad_hold(wby_slidepad_t *sp, uint16_t x, uint16_t y)
 {
-    if (self == NULL)
+    if (sp == NULL)
     {
         return;
     }
 
-    if (x == QPI_SLIDEPAD_NEUTRAL)
+    if (x == WBY_SLIDEPAD_NEUTRAL)
     {
-        self->horizontal->source(self->horizontal, 0);
+        sp->horizontal->source(sp->horizontal, 0);
     }
-    else if (QPI_SLIDEPAD_NEUTRAL < x)
+    else if (WBY_SLIDEPAD_NEUTRAL < x)
     {
         // 32768-65535
-        // x - QPI_SLIDEPAD_NEUTRAL = 1-32768
-        self->horizontal->sink(self->horizontal, (uint16_t)(((double)(x - QPI_SLIDEPAD_NEUTRAL) / 32768) * UINT16_MAX));
+        // x - WBY_SLIDEPAD_NEUTRAL = 1-32768
+        sp->horizontal->sink(sp->horizontal, (uint16_t)(((double)(x - WBY_SLIDEPAD_NEUTRAL) / 32768) * UINT16_MAX));
     }
     else
     {
         // 0-32766
-        // QPI_SLIDEPAD_NEUTRAL - x = 1-32767
-        self->horizontal->source(self->horizontal, (uint16_t)(((double)(QPI_SLIDEPAD_NEUTRAL - x) / 32767) * UINT16_MAX));
+        // WBY_SLIDEPAD_NEUTRAL - x = 1-32767
+        sp->horizontal->source(sp->horizontal, (uint16_t)(((double)(WBY_SLIDEPAD_NEUTRAL - x) / 32767) * UINT16_MAX));
     }
 
-    if (y == QPI_SLIDEPAD_NEUTRAL)
+    if (y == WBY_SLIDEPAD_NEUTRAL)
     {
-        self->vertical->source(self->vertical, 0);
+        sp->vertical->source(sp->vertical, 0);
     }
-    else if (QPI_SLIDEPAD_NEUTRAL < y)
+    else if (WBY_SLIDEPAD_NEUTRAL < y)
     {
-        self->vertical->sink(self->vertical, (uint16_t)(((double)(y - QPI_SLIDEPAD_NEUTRAL) / 32768) * UINT16_MAX));
+        sp->vertical->sink(sp->vertical, (uint16_t)(((double)(y - WBY_SLIDEPAD_NEUTRAL) / 32768) * UINT16_MAX));
     }
     else
     {
-        self->vertical->source(self->vertical, (uint16_t)(((double)(QPI_SLIDEPAD_NEUTRAL - y) / 32767) * UINT16_MAX));
+        sp->vertical->source(sp->vertical, (uint16_t)(((double)(WBY_SLIDEPAD_NEUTRAL - y) / 32767) * UINT16_MAX));
     }
 }
 
-void qpi_slidepad_release(QpiSlidePad *self)
+void wby_slidepad_release(wby_slidepad_t *sp)
 {
-    if (self == NULL)
+    if (sp == NULL)
     {
         return;
     }
 
-    qpi_slidepad_hold(self, QPI_SLIDEPAD_NEUTRAL, QPI_SLIDEPAD_NEUTRAL);
+    wby_slidepad_hold(sp, WBY_SLIDEPAD_NEUTRAL, WBY_SLIDEPAD_NEUTRAL);
 }
 
-QpiSlidePad *qpi_slidepad_new(QpiCurrentDAConverterInterface *vertical, QpiCurrentDAConverterInterface *horizontal)
+wby_slidepad_t *wby_slidepad_new(wby_idac_t *vertical, wby_idac_t *horizontal)
 {
     if (vertical == NULL || horizontal == NULL)
     {
         return NULL;
     }
 
-    QpiSlidePad *self = (QpiSlidePad *)malloc(sizeof(QpiSlidePad));
-    if (self == NULL)
+    wby_slidepad_t *sp = (wby_slidepad_t *)malloc(sizeof(wby_slidepad_t));
+    if (sp == NULL)
     {
         return NULL;
     }
 
-    self->vertical = vertical;
-    self->horizontal = horizontal;
+    sp->vertical = vertical;
+    sp->horizontal = horizontal;
 
-    qpi_slidepad_release(self);
+    wby_slidepad_release(sp);
 
-    return self;
+    return sp;
 }
 
-void qpi_slidepad_delete(QpiSlidePad *self)
+void wby_slidepad_delete(wby_slidepad_t *sp)
 {
-    if (self == NULL)
+    if (sp == NULL)
     {
         return;
     }
 
-    free(self);
+    free(sp);
 }

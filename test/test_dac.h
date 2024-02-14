@@ -10,19 +10,19 @@ typedef enum TestDACState
 
 typedef struct TestDAC
 {
-    QpiCurrentDAConverterInterface parent;
+    wby_idac_t parent;
     TestDACState state;
     uint16_t value;
 } TestDAC;
 
-static void test_dac_sink(QpiCurrentDAConverterInterface *parent, uint16_t value)
+static void test_dac_sink(wby_idac_t *parent, uint16_t value)
 {
     TestDAC *self = (TestDAC *)parent;
     self->state = TEST_DAC_SINK;
     self->value = value;
 }
 
-static void test_dac_source(QpiCurrentDAConverterInterface *parent, uint16_t value)
+static void test_dac_source(wby_idac_t *parent, uint16_t value)
 {
     TestDAC *self = (TestDAC *)parent;
     self->state = TEST_DAC_SOURCE;

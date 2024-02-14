@@ -11,17 +11,17 @@ typedef enum TestGPIOState
 
 typedef struct TestGPIO
 {
-    QpiGeneralPurposeIOInterface parent;
+    wby_gpio_t parent;
     TestGPIOState state;
 } TestGPIO;
 
-static void test_gpio_set_low(QpiGeneralPurposeIOInterface *parent)
+static void test_gpio_set_low(wby_gpio_t *parent)
 {
     TestGPIO *self = (TestGPIO *)parent;
     self->state = TEST_GPIO_LOW;
 }
 
-static void test_gpio_set_hi_z(QpiGeneralPurposeIOInterface *parent)
+static void test_gpio_set_hi_z(wby_gpio_t *parent)
 {
     TestGPIO *self = (TestGPIO *)parent;
     self->state = TEST_GPIO_HI_Z;

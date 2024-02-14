@@ -2,61 +2,61 @@
 
 #include <stdlib.h>
 
-void qpi_touchscreen_hold(QpiTouchScreen *self, uint16_t x, uint16_t y)
+void wby_touchscreen_hold(wby_touchscreen_t *ts, uint16_t x, uint16_t y)
 {
-    if (self == NULL)
+    if (ts == NULL)
     {
         return;
     }
 
-    self->vertical->set_wiper_position(self->vertical, y);
-    self->horizontal->set_wiper_position(self->horizontal, x);
+    ts->vertical->set_wiper_position(ts->vertical, y);
+    ts->horizontal->set_wiper_position(ts->horizontal, x);
 
-    self->vertical->power_on(self->vertical);
-    self->horizontal->power_on(self->horizontal);
-    self->sw->on(self->sw);
+    ts->vertical->power_on(ts->vertical);
+    ts->horizontal->power_on(ts->horizontal);
+    ts->sw->on(ts->sw);
 }
 
-void qpi_touchscreen_release(QpiTouchScreen *self)
+void wby_touchscreen_release(wby_touchscreen_t *ts)
 {
-    if (self == NULL)
+    if (ts == NULL)
     {
         return;
     }
 
-    self->sw->off(self->sw);
-    self->vertical->shutdown(self->vertical);
-    self->horizontal->shutdown(self->horizontal);
+    ts->sw->off(ts->sw);
+    ts->vertical->shutdown(ts->vertical);
+    ts->horizontal->shutdown(ts->horizontal);
 }
 
-QpiTouchScreen *qpi_touchscreen_new(QpiDigitalPotentiometerInterface *vertical, QpiDigitalPotentiometerInterface *horizontal, QpiSPSTSwitchInterface *sw)
+wby_touchscreen_t *wby_touchscreen_new(wby_rdac_t *vertical, wby_rdac_t *horizontal, wby_spst_switch_t *sw)
 {
     if (vertical == NULL || horizontal == NULL || sw == NULL)
     {
         return NULL;
     }
 
-    QpiTouchScreen *self = (QpiTouchScreen *)malloc(sizeof(QpiTouchScreen));
-    if (self == NULL)
+    wby_touchscreen_t *ts = (wby_touchscreen_t *)malloc(sizeof(wby_touchscreen_t));
+    if (ts == NULL)
     {
         return NULL;
     }
 
-    self->vertical = vertical;
-    self->horizontal = horizontal;
-    self->sw = sw;
+    ts->vertical = vertical;
+    ts->horizontal = horizontal;
+    ts->sw = sw;
 
-    qpi_touchscreen_release(self);
+    wby_touchscreen_release(ts);
 
-    return self;
+    return ts;
 }
 
-void qpi_touchscreen_delete(QpiTouchScreen *self)
+void wby_touchscreen_delete(wby_touchscreen_t *ts)
 {
-    if (self == NULL)
+    if (ts == NULL)
     {
         return;
     }
 
-    free(self);
+    free(ts);
 }

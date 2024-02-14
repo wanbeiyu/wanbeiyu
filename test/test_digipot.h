@@ -10,24 +10,24 @@ typedef enum TestDigiPotState
 
 typedef struct TestDigiPot
 {
-    QpiDigitalPotentiometerInterface parent;
+    wby_rdac_t parent;
     TestDigiPotState state;
     uint16_t position;
 } TestDigiPot;
 
-static void test_digipot_set_wiper_position(QpiDigitalPotentiometerInterface *parent, uint16_t position)
+static void test_digipot_set_wiper_position(wby_rdac_t *parent, uint16_t position)
 {
     TestDigiPot *self = (TestDigiPot *)parent;
     self->position = position;
 }
 
-static void test_digipot_power_on(QpiDigitalPotentiometerInterface *parent)
+static void test_digipot_power_on(wby_rdac_t *parent)
 {
     TestDigiPot *self = (TestDigiPot *)parent;
     self->state = TEST_DIGIPOT_POWER_ON;
 }
 
-static void test_digipot_shutdown(QpiDigitalPotentiometerInterface *parent)
+static void test_digipot_shutdown(wby_rdac_t *parent)
 {
     TestDigiPot *self = (TestDigiPot *)parent;
     self->state = TEST_DIGIPOT_SHUTDOWN;

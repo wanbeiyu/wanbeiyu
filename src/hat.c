@@ -2,113 +2,113 @@
 
 #include "stdlib.h"
 
-void qpi_hat_hold(QpiHat *self, QpiHatDirection direction)
+void wby_hat_hold(wby_hat_t *hat, wby_hat_direction_t direction)
 {
-    if (self == NULL)
+    if (hat == NULL)
     {
         return;
     }
 
     switch (direction)
     {
-    case QPI_HAT_UP:
-        qpi_button_hold(self->up);
-        qpi_button_release(self->right);
-        qpi_button_release(self->down);
-        qpi_button_release(self->left);
+    case WBY_HAT_UP:
+        wby_button_hold(hat->up);
+        wby_button_release(hat->right);
+        wby_button_release(hat->down);
+        wby_button_release(hat->left);
         break;
-    case QPI_HAT_UPRIGHT:
-        qpi_button_hold(self->up);
-        qpi_button_hold(self->right);
-        qpi_button_release(self->down);
-        qpi_button_release(self->left);
+    case WBY_HAT_UPRIGHT:
+        wby_button_hold(hat->up);
+        wby_button_hold(hat->right);
+        wby_button_release(hat->down);
+        wby_button_release(hat->left);
         break;
-    case QPI_HAT_RIGHT:
-        qpi_button_release(self->up);
-        qpi_button_hold(self->right);
-        qpi_button_release(self->down);
-        qpi_button_release(self->left);
+    case WBY_HAT_RIGHT:
+        wby_button_release(hat->up);
+        wby_button_hold(hat->right);
+        wby_button_release(hat->down);
+        wby_button_release(hat->left);
         break;
-    case QPI_HAT_DOWNRIGHT:
-        qpi_button_release(self->up);
-        qpi_button_hold(self->right);
-        qpi_button_hold(self->down);
-        qpi_button_release(self->left);
+    case WBY_HAT_DOWNRIGHT:
+        wby_button_release(hat->up);
+        wby_button_hold(hat->right);
+        wby_button_hold(hat->down);
+        wby_button_release(hat->left);
         break;
-    case QPI_HAT_DOWN:
-        qpi_button_release(self->up);
-        qpi_button_release(self->right);
-        qpi_button_hold(self->down);
-        qpi_button_release(self->left);
+    case WBY_HAT_DOWN:
+        wby_button_release(hat->up);
+        wby_button_release(hat->right);
+        wby_button_hold(hat->down);
+        wby_button_release(hat->left);
         break;
-    case QPI_HAT_DOWNLEFT:
-        qpi_button_release(self->up);
-        qpi_button_release(self->right);
-        qpi_button_hold(self->down);
-        qpi_button_hold(self->left);
+    case WBY_HAT_DOWNLEFT:
+        wby_button_release(hat->up);
+        wby_button_release(hat->right);
+        wby_button_hold(hat->down);
+        wby_button_hold(hat->left);
         break;
-    case QPI_HAT_LEFT:
-        qpi_button_release(self->up);
-        qpi_button_release(self->right);
-        qpi_button_release(self->down);
-        qpi_button_hold(self->left);
+    case WBY_HAT_LEFT:
+        wby_button_release(hat->up);
+        wby_button_release(hat->right);
+        wby_button_release(hat->down);
+        wby_button_hold(hat->left);
         break;
-    case QPI_HAT_UPLEFT:
-        qpi_button_hold(self->up);
-        qpi_button_release(self->right);
-        qpi_button_release(self->down);
-        qpi_button_hold(self->left);
+    case WBY_HAT_UPLEFT:
+        wby_button_hold(hat->up);
+        wby_button_release(hat->right);
+        wby_button_release(hat->down);
+        wby_button_hold(hat->left);
         break;
-    case QPI_HAT_NEUTRAL:
-        qpi_button_release(self->up);
-        qpi_button_release(self->right);
-        qpi_button_release(self->down);
-        qpi_button_release(self->left);
+    case WBY_HAT_NEUTRAL:
+        wby_button_release(hat->up);
+        wby_button_release(hat->right);
+        wby_button_release(hat->down);
+        wby_button_release(hat->left);
         break;
     default:
         return;
     }
 }
 
-void qpi_hat_release(QpiHat *self)
+void wby_hat_release(wby_hat_t *hat)
 {
-    if (self == NULL)
+    if (hat == NULL)
     {
         return;
     }
 
-    qpi_hat_hold(self, QPI_HAT_NEUTRAL);
+    wby_hat_hold(hat, WBY_HAT_NEUTRAL);
 }
 
-QpiHat *qpi_hat_new(QpiButton *up, QpiButton *right, QpiButton *down, QpiButton *left)
+wby_hat_t *wby_hat_new(wby_button_t *up, wby_button_t *right, wby_button_t *down, wby_button_t *left)
 {
     if (up == NULL || right == NULL || down == NULL || left == NULL)
     {
         return NULL;
     }
 
-    QpiHat *self = (QpiHat *)malloc(sizeof(QpiHat));
-    if (self == NULL)
+    wby_hat_t *hat = (wby_hat_t *)malloc(sizeof(wby_hat_t));
+    if (hat == NULL)
     {
         return NULL;
     }
 
-    self->up = up;
-    self->right = right;
-    self->down = down;
-    self->left = left;
+    hat->up = up;
+    hat->right = right;
+    hat->down = down;
+    hat->left = left;
 
-    qpi_hat_release(self);
+    wby_hat_release(hat);
 
-    return self;
+    return hat;
 }
 
-void qpi_hat_delete(QpiHat *self)
+void wby_hat_delete(wby_hat_t *hat)
 {
-    if (self == NULL)
+    if (hat == NULL)
     {
         return;
     }
 
-    free(self);
+    free(hat);
 }

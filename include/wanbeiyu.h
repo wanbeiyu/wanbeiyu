@@ -8,100 +8,100 @@ extern "C"
 
 #include <stdint.h>
 
-    typedef struct QpiGeneralPurposeIOInterface
+    typedef struct wby_gpio_t
     {
-        void (*set_low)(struct QpiGeneralPurposeIOInterface *self);
-        void (*set_hi_z)(struct QpiGeneralPurposeIOInterface *self);
-    } QpiGeneralPurposeIOInterface;
+        void (*set_low)(struct wby_gpio_t *gpio);
+        void (*set_hi_z)(struct wby_gpio_t *gpio);
+    } wby_gpio_t;
 
     /**
      * @brief -263.79-263.79[uA] output is used, but slight differences should be able to be handled by calibration on the 3DS side.
      */
-    typedef struct QpiCurrentDAConverterInterface
+    typedef struct wby_idac_t
     {
-        void (*sink)(struct QpiCurrentDAConverterInterface *self, uint16_t value);
-        void (*source)(struct QpiCurrentDAConverterInterface *self, uint16_t value);
-    } QpiCurrentDAConverterInterface;
+        void (*sink)(struct wby_idac_t *idac, uint16_t value);
+        void (*source)(struct wby_idac_t *idac, uint16_t value);
+    } wby_idac_t;
 
     /**
      * @brief Total resistance value must be less than pull-up resistance (details unknown, 10kΩ?). Horizontal dimension is 320px and vertical dimension is 240px.
      */
-    typedef struct QpiDigitalPotentiometerInterface
+    typedef struct wby_rdac_t
     {
-        void (*set_wiper_position)(struct QpiDigitalPotentiometerInterface *self, uint16_t position);
-        void (*power_on)(struct QpiDigitalPotentiometerInterface *self);
-        void (*shutdown)(struct QpiDigitalPotentiometerInterface *self);
-    } QpiDigitalPotentiometerInterface;
+        void (*set_wiper_position)(struct wby_rdac_t *rdac, uint16_t position);
+        void (*power_on)(struct wby_rdac_t *rdac);
+        void (*shutdown)(struct wby_rdac_t *rdac);
+    } wby_rdac_t;
 
     /**
      * @brief Use CMOS analog switches with low on-resistance.
      */
-    typedef struct QpiSPSTSwitchInterface
+    typedef struct wby_spst_switch_t
     {
-        void (*on)(struct QpiSPSTSwitchInterface *self);
-        void (*off)(struct QpiSPSTSwitchInterface *self);
-    } QpiSPSTSwitchInterface;
+        void (*on)(struct wby_spst_switch_t *sw);
+        void (*off)(struct wby_spst_switch_t *sw);
+    } wby_spst_switch_t;
 
-    typedef struct QpiButton
+    typedef struct wby_button_t
     {
-        QpiGeneralPurposeIOInterface *gpio;
-    } QpiButton;
+        wby_gpio_t *gpio;
+    } wby_button_t;
 
-    void qpi_button_hold(QpiButton *self);
-    void qpi_button_release(QpiButton *self);
-    QpiButton *qpi_button_new(QpiGeneralPurposeIOInterface *gpio);
-    void qpi_button_delete(QpiButton *self);
+    void wby_button_hold(wby_button_t *btn);
+    void wby_button_release(wby_button_t *btn);
+    wby_button_t *wby_button_new(wby_gpio_t *gpio);
+    void wby_button_delete(wby_button_t *btn);
 
-    typedef struct QpiHat
+    typedef struct wby_hat_t
     {
-        QpiButton *up;
-        QpiButton *right;
-        QpiButton *down;
-        QpiButton *left;
-    } QpiHat;
+        wby_button_t *up;
+        wby_button_t *right;
+        wby_button_t *down;
+        wby_button_t *left;
+    } wby_hat_t;
 
-    typedef enum QpiHatDirection
+    typedef enum wby_hat_direction_t
     {
-        QPI_HAT_UP,
-        QPI_HAT_UPRIGHT,
-        QPI_HAT_RIGHT,
-        QPI_HAT_DOWNRIGHT,
-        QPI_HAT_DOWN,
-        QPI_HAT_DOWNLEFT,
-        QPI_HAT_LEFT,
-        QPI_HAT_UPLEFT,
-        QPI_HAT_NEUTRAL
-    } QpiHatDirection;
+        WBY_HAT_UP,
+        WBY_HAT_UPRIGHT,
+        WBY_HAT_RIGHT,
+        WBY_HAT_DOWNRIGHT,
+        WBY_HAT_DOWN,
+        WBY_HAT_DOWNLEFT,
+        WBY_HAT_LEFT,
+        WBY_HAT_UPLEFT,
+        WBY_HAT_NEUTRAL
+    } wby_hat_direction_t;
 
-    void qpi_hat_hold(QpiHat *self, QpiHatDirection direction);
-    void qpi_hat_release(QpiHat *self);
-    QpiHat *qpi_hat_new(QpiButton *up, QpiButton *right, QpiButton *down, QpiButton *left);
-    void qpi_hat_delete(QpiHat *self);
+    void wby_hat_hold(wby_hat_t *hat, wby_hat_direction_t direction);
+    void wby_hat_release(wby_hat_t *hat);
+    wby_hat_t *wby_hat_new(wby_button_t *up, wby_button_t *right, wby_button_t *down, wby_button_t *left);
+    void wby_hat_delete(wby_hat_t *hat);
 
-    typedef struct QpiSlidePad
+    typedef struct wby_slidepad_t
     {
-        QpiCurrentDAConverterInterface *vertical;
-        QpiCurrentDAConverterInterface *horizontal;
-    } QpiSlidePad;
+        wby_idac_t *vertical;
+        wby_idac_t *horizontal;
+    } wby_slidepad_t;
 
-#define QPI_SLIDEPAD_NEUTRAL ((uint16_t)32767)
+#define WBY_SLIDEPAD_NEUTRAL ((uint16_t)32767)
 
-    void qpi_slidepad_hold(QpiSlidePad *self, uint16_t x, uint16_t y);
-    void qpi_slidepad_release(QpiSlidePad *self);
-    QpiSlidePad *qpi_slidepad_new(QpiCurrentDAConverterInterface *vertical, QpiCurrentDAConverterInterface *horizontal);
-    void qpi_slidepad_delete(QpiSlidePad *self);
+    void wby_slidepad_hold(wby_slidepad_t *sp, uint16_t x, uint16_t y);
+    void wby_slidepad_release(wby_slidepad_t *sp);
+    wby_slidepad_t *wby_slidepad_new(wby_idac_t *vertical, wby_idac_t *horizontal);
+    void wby_slidepad_delete(wby_slidepad_t *sp);
 
-    typedef struct QpiTouchScreen
+    typedef struct wby_touchscreen_t
     {
-        QpiDigitalPotentiometerInterface *vertical;
-        QpiDigitalPotentiometerInterface *horizontal;
-        QpiSPSTSwitchInterface *sw;
-    } QpiTouchScreen;
+        wby_rdac_t *vertical;
+        wby_rdac_t *horizontal;
+        wby_spst_switch_t *sw;
+    } wby_touchscreen_t;
 
-    void qpi_touchscreen_hold(QpiTouchScreen *self, uint16_t x, uint16_t y);
-    void qpi_touchscreen_release(QpiTouchScreen *self);
-    QpiTouchScreen *qpi_touchscreen_new(QpiDigitalPotentiometerInterface *vertical, QpiDigitalPotentiometerInterface *horizontal, QpiSPSTSwitchInterface *sw);
-    void qpi_touchscreen_delete(QpiTouchScreen *self);
+    void wby_touchscreen_hold(wby_touchscreen_t *ts, uint16_t x, uint16_t y);
+    void wby_touchscreen_release(wby_touchscreen_t *ts);
+    wby_touchscreen_t *wby_touchscreen_new(wby_rdac_t *vertical, wby_rdac_t *horizontal, wby_spst_switch_t *sw);
+    void wby_touchscreen_delete(wby_touchscreen_t *ts);
 
 #ifdef __cplusplus
 }

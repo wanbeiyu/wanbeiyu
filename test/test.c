@@ -15,18 +15,18 @@ int test_button(void)
     TestGPIO *gpio = test_gpio_new();
     assert(gpio != NULL);
 
-    wby_button_t *btn = wby_button_new((wby_gpio_t *)gpio);
-    assert(btn != NULL);
+    wby_button_t btn;
+    wby_button_init(&btn, (wby_gpio_t *)gpio);
     assert(gpio->state == TEST_GPIO_HI_Z);
 
-    wby_button_hold(btn);
+    wby_button_hold(&btn);
     if (!(gpio->state == TEST_GPIO_LOW))
     {
         index = 0;
         goto cleanup;
     }
 
-    wby_button_release(btn);
+    wby_button_release(&btn);
     if (!(gpio->state == TEST_GPIO_HI_Z))
     {
         index = 1;
@@ -34,7 +34,6 @@ int test_button(void)
     }
 
 cleanup:
-    wby_button_delete(btn);
     test_gpio_delete(gpio);
 
     return index;
@@ -46,32 +45,32 @@ int test_hat(void)
 
     TestGPIO *gpio_up = test_gpio_new();
     assert(gpio_up != NULL);
-    wby_button_t *btn_up = wby_button_new((wby_gpio_t *)gpio_up);
-    assert(btn_up != NULL);
-
+    wby_button_t btn_up;
+    wby_button_init(&btn_up, (wby_gpio_t *)gpio_up);
+    
     TestGPIO *gpio_right = test_gpio_new();
     assert(gpio_right != NULL);
-    wby_button_t *btn_right = wby_button_new((wby_gpio_t *)gpio_right);
-    assert(btn_right != NULL);
-
+    wby_button_t btn_right;
+    wby_button_init(&btn_right, (wby_gpio_t *)gpio_right);
+    
     TestGPIO *gpio_down = test_gpio_new();
     assert(gpio_down != NULL);
-    wby_button_t *btn_down = wby_button_new((wby_gpio_t *)gpio_down);
-    assert(btn_down != NULL);
-
+    wby_button_t btn_down;
+    wby_button_init(&btn_down, (wby_gpio_t *)gpio_down);
+    
     TestGPIO *gpio_left = test_gpio_new();
     assert(gpio_left != NULL);
-    wby_button_t *btn_left = wby_button_new((wby_gpio_t *)gpio_left);
-    assert(btn_left != NULL);
-
-    wby_hat_t *hat = wby_hat_new(btn_up, btn_right, btn_down, btn_left);
-    assert(hat != NULL);
+    wby_button_t btn_left;
+    wby_button_init(&btn_left, (wby_gpio_t *)gpio_left);
+    
+    wby_hat_t hat;
+    wby_hat_init(&hat, &btn_up, &btn_right, &btn_down, &btn_left);
     assert(gpio_up->state == TEST_GPIO_HI_Z &&
            gpio_right->state == TEST_GPIO_HI_Z &&
            gpio_down->state == TEST_GPIO_HI_Z &&
            gpio_left->state == TEST_GPIO_HI_Z);
 
-    wby_hat_hold(hat, WBY_HAT_UP);
+    wby_hat_hold(&hat, WBY_HAT_UP);
     if (!(gpio_up->state == TEST_GPIO_LOW &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -81,7 +80,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_hold(hat, WBY_HAT_UPRIGHT);
+    wby_hat_hold(&hat, WBY_HAT_UPRIGHT);
     if (!(gpio_up->state == TEST_GPIO_LOW &&
           gpio_right->state == TEST_GPIO_LOW &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -91,7 +90,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_hold(hat, WBY_HAT_RIGHT);
+    wby_hat_hold(&hat, WBY_HAT_RIGHT);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_LOW &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -101,7 +100,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_hold(hat, WBY_HAT_DOWNRIGHT);
+    wby_hat_hold(&hat, WBY_HAT_DOWNRIGHT);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_LOW &&
           gpio_down->state == TEST_GPIO_LOW &&
@@ -111,7 +110,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_hold(hat, WBY_HAT_DOWN);
+    wby_hat_hold(&hat, WBY_HAT_DOWN);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_LOW &&
@@ -121,7 +120,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_hold(hat, WBY_HAT_DOWNLEFT);
+    wby_hat_hold(&hat, WBY_HAT_DOWNLEFT);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_LOW &&
@@ -131,7 +130,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_hold(hat, WBY_HAT_LEFT);
+    wby_hat_hold(&hat, WBY_HAT_LEFT);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -141,7 +140,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_hold(hat, WBY_HAT_UPLEFT);
+    wby_hat_hold(&hat, WBY_HAT_UPLEFT);
     if (!(gpio_up->state == TEST_GPIO_LOW &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -151,7 +150,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_hold(hat, WBY_HAT_NEUTRAL);
+    wby_hat_hold(&hat, WBY_HAT_NEUTRAL);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -161,7 +160,7 @@ int test_hat(void)
         goto cleanup;
     }
 
-    wby_hat_release(hat);
+    wby_hat_release(&hat);
     if (!(gpio_up->state == TEST_GPIO_HI_Z &&
           gpio_right->state == TEST_GPIO_HI_Z &&
           gpio_down->state == TEST_GPIO_HI_Z &&
@@ -172,14 +171,9 @@ int test_hat(void)
     }
 
 cleanup:
-    wby_hat_delete(hat);
-    wby_button_delete(btn_left);
     test_gpio_delete(gpio_left);
-    wby_button_delete(btn_down);
     test_gpio_delete(gpio_down);
-    wby_button_delete(btn_right);
     test_gpio_delete(gpio_right);
-    wby_button_delete(btn_up);
     test_gpio_delete(gpio_up);
 
     return index;

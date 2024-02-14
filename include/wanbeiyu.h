@@ -44,39 +44,58 @@ extern "C"
 
     typedef struct wby_button_t
     {
-        wby_gpio_t *gpio;
+        wby_gpio_t *_gpio;
     } wby_button_t;
 
-    void wby_button_hold(wby_button_t *btn);
-    void wby_button_release(wby_button_t *btn);
-    wby_button_t *wby_button_new(wby_gpio_t *gpio);
-    void wby_button_delete(wby_button_t *btn);
+#define wby_button_hold(btn) ((btn) != NULL ? (btn)->_gpio->set_low((btn)->_gpio) \
+                                            : (void)0)
+#define wby_button_release(btn) ((btn) != NULL ? (btn)->_gpio->set_hi_z((btn)->_gpio) \
+                                               : (void)0)
+#define wby_button_init(btn, gpio) (((btn) != NULL && (gpio) != NULL) ? ((btn)->_gpio = (gpio),     \
+                                                                         wby_button_release((btn))) \
+                                                                      : (void)0)
 
     typedef struct wby_hat_t
     {
-        wby_button_t *up;
-        wby_button_t *right;
-        wby_button_t *down;
-        wby_button_t *left;
+        wby_button_t *_up;
+        wby_button_t *_right;
+        wby_button_t *_down;
+        wby_button_t *_left;
     } wby_hat_t;
 
     typedef enum wby_hat_direction_t
     {
-        WBY_HAT_UP,
-        WBY_HAT_UPRIGHT,
-        WBY_HAT_RIGHT,
-        WBY_HAT_DOWNRIGHT,
-        WBY_HAT_DOWN,
-        WBY_HAT_DOWNLEFT,
-        WBY_HAT_LEFT,
-        WBY_HAT_UPLEFT,
-        WBY_HAT_NEUTRAL
+        WBY_HAT_UP = 8,        /* 0b1000 */
+        WBY_HAT_UPRIGHT = 12,  /* 0b1100 */
+        WBY_HAT_RIGHT = 4,     /* 0b0100 */
+        WBY_HAT_DOWNRIGHT = 6, /* 0b0110 */
+        WBY_HAT_DOWN = 2,      /* 0b0010 */
+        WBY_HAT_DOWNLEFT = 3,  /* 0b0011 */
+        WBY_HAT_LEFT = 1,      /* 0b0001 */
+        WBY_HAT_UPLEFT = 9,    /* 0b1001 */
+        WBY_HAT_NEUTRAL = 0    /* 0b0000 */
     } wby_hat_direction_t;
 
-    void wby_hat_hold(wby_hat_t *hat, wby_hat_direction_t direction);
-    void wby_hat_release(wby_hat_t *hat);
-    wby_hat_t *wby_hat_new(wby_button_t *up, wby_button_t *right, wby_button_t *down, wby_button_t *left);
-    void wby_hat_delete(wby_hat_t *hat);
+#define wby_hat_hold(hat, dir) ((hat) != NULL ? (((dir) & WBY_HAT_UP ? wby_button_hold((hat)->_up)            \
+                                                                     : wby_button_release((hat)->_up)),       \
+                                                 ((dir) & WBY_HAT_RIGHT ? wby_button_hold((hat)->_right)      \
+                                                                        : wby_button_release((hat)->_right)), \
+                                                 ((dir) & WBY_HAT_DOWN ? wby_button_hold((hat)->_down)        \
+                                                                       : wby_button_release((hat)->_down)),   \
+                                                 ((dir) & WBY_HAT_LEFT ? wby_button_hold((hat)->_left)        \
+                                                                       : wby_button_release((hat)->_left)))   \
+                                              : (void)0)
+#define wby_hat_release(hat) ((hat) != NULL ? (wby_button_release((hat)->_up),    \
+                                               wby_button_release((hat)->_right), \
+                                               wby_button_release((hat)->_down),  \
+                                               wby_button_release((hat)->_left))  \
+                                            : (void)0)
+#define wby_hat_init(hat, up, right, down, left) (((hat) != NULL && (up) != NULL && (right) != NULL && (down) != NULL && (left) != NULL) ? ((hat)->_up = up,        \
+                                                                                                                                            (hat)->_right = right,  \
+                                                                                                                                            (hat)->_down = down,    \
+                                                                                                                                            (hat)->_left = left,    \
+                                                                                                                                            wby_hat_release((hat))) \
+                                                                                                                                         : (void)0)
 
     typedef struct wby_slidepad_t
     {

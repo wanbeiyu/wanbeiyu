@@ -4,9 +4,7 @@ project(wanbeiyu)
 set(CMAKE_C_STANDARD 99)
 
 include_directories(include)
-add_library(wanbeiyu STATIC 
-            src/button.c
-            src/hat.c
+add_library(wanbeiyu STATIC
             src/slidepad.c
             src/touchscreen.c)
 

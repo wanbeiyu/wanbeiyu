@@ -4,8 +4,8 @@ project(wanbeiyu)
 set(CMAKE_C_STANDARD 99)
 
 include_directories(include)
-add_library(wanbeiyu STATIC
-            src/touchscreen.c)
+add_library(wanbeiyu INTERFACE)
+target_include_directories(wanbeiyu INTERFACE include)
 
 # Create test executable
 add_executable(test test/test.c)

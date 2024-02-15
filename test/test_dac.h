@@ -15,18 +15,18 @@ typedef struct TestDAC
     uint8_t value;
 } TestDAC;
 
-static void test_dac_sink(wby_idac_t *parent, uint8_t value)
+static void test_dac_set_sink(wby_idac_t *parent, uint8_t val)
 {
     TestDAC *self = (TestDAC *)parent;
     self->state = TEST_DAC_SINK;
-    self->value = value;
+    self->value = val;
 }
 
-static void test_dac_source(wby_idac_t *parent, uint8_t value)
+static void test_dac_set_source(wby_idac_t *parent, uint8_t val)
 {
     TestDAC *self = (TestDAC *)parent;
     self->state = TEST_DAC_SOURCE;
-    self->value = value;
+    self->value = val;
 }
 
 TestDAC *test_dac_new(void)
@@ -37,8 +37,8 @@ TestDAC *test_dac_new(void)
         return NULL;
     }
 
-    self->parent.sink = test_dac_sink;
-    self->parent.source = test_dac_source;
+    self->parent.set_sink = test_dac_set_sink;
+    self->parent.set_source = test_dac_set_source;
 
     self->state = TEST_DAC_SOURCE;
     self->value = 0;

@@ -8,39 +8,13 @@ extern "C"
 
 #include <stdint.h>
 
+#define wby_internal_remap(v, in_min, in_max, out_min, out_max) (((double)(v) - (double)(in_min)) * ((double)(out_max) - (double)(out_min)) / ((double)(in_max) - (double)(in_min)) + (double)(out_min))
+
     typedef struct wby_gpio_t
     {
         void (*set_low)(struct wby_gpio_t *gpio);
         void (*set_hi_z)(struct wby_gpio_t *gpio);
     } wby_gpio_t;
-
-    /**
-     * @brief -263.79-263.79[uA] output is used, but slight differences should be able to be handled by calibration on the 3DS side.
-     */
-    typedef struct wby_idac_t
-    {
-        void (*sink)(struct wby_idac_t *idac, uint8_t value);
-        void (*source)(struct wby_idac_t *idac, uint8_t value);
-    } wby_idac_t;
-
-    /**
-     * @brief Total resistance value must be less than pull-up resistance (details unknown, 10kΩ?). Horizontal dimension is 320px and vertical dimension is 240px.
-     */
-    typedef struct wby_rdac_t
-    {
-        void (*set_wiper_position)(struct wby_rdac_t *rdac, uint16_t position);
-        void (*power_on)(struct wby_rdac_t *rdac);
-        void (*shutdown)(struct wby_rdac_t *rdac);
-    } wby_rdac_t;
-
-    /**
-     * @brief Use CMOS analog switches with low on-resistance.
-     */
-    typedef struct wby_spst_switch_t
-    {
-        void (*on)(struct wby_spst_switch_t *sw);
-        void (*off)(struct wby_spst_switch_t *sw);
-    } wby_spst_switch_t;
 
     typedef struct wby_button_t
     {
@@ -51,9 +25,11 @@ extern "C"
                                             : (void)0)
 #define wby_button_release(btn) ((btn) != NULL ? (btn)->_gpio->set_hi_z((btn)->_gpio) \
                                                : (void)0)
-#define wby_button_init(btn, gpio) (((btn) != NULL && (gpio) != NULL) ? ((btn)->_gpio = (gpio),     \
-                                                                         wby_button_release((btn))) \
-                                                                      : (void)0)
+#define wby_button_init(btn, gpio) (((btn) != NULL &&                 \
+                                     (gpio) != NULL)                  \
+                                        ? ((btn)->_gpio = (gpio),     \
+                                           wby_button_release((btn))) \
+                                        : (void)0)
 
     typedef struct wby_hat_t
     {
@@ -90,12 +66,23 @@ extern "C"
                                                wby_button_release((hat)->_down),  \
                                                wby_button_release((hat)->_left))  \
                                             : (void)0)
-#define wby_hat_init(hat, up, right, down, left) (((hat) != NULL && (up) != NULL && (right) != NULL && (down) != NULL && (left) != NULL) ? ((hat)->_up = up,        \
-                                                                                                                                            (hat)->_right = right,  \
-                                                                                                                                            (hat)->_down = down,    \
-                                                                                                                                            (hat)->_left = left,    \
-                                                                                                                                            wby_hat_release((hat))) \
-                                                                                                                                         : (void)0)
+#define wby_hat_init(hat, up, right, down, left) (((hat) != NULL &&               \
+                                                   (up) != NULL &&                \
+                                                   (right) != NULL &&             \
+                                                   (down) != NULL &&              \
+                                                   (left) != NULL)                \
+                                                      ? ((hat)->_up = (up),       \
+                                                         (hat)->_right = (right), \
+                                                         (hat)->_down = (down),   \
+                                                         (hat)->_left = (left),   \
+                                                         wby_hat_release((hat)))  \
+                                                      : (void)0)
+
+    typedef struct wby_idac_t
+    {
+        void (*set_sink)(struct wby_idac_t *idac, uint8_t val);
+        void (*set_source)(struct wby_idac_t *idac, uint8_t val);
+    } wby_idac_t;
 
     typedef struct wby_slidepad_t
     {
@@ -104,29 +91,63 @@ extern "C"
     } wby_slidepad_t;
 
 #define WBY_SLIDEPAD_NEUTRAL ((uint8_t)128)
-#define wby_slidepad_hold(sp, x, y) ((sp) != NULL ? ((WBY_SLIDEPAD_NEUTRAL < (x) ? /* 129, 130, ..., 255; (x - WBY_SLIDEPAD_NEUTRAL) = 1, 2, ..., 127 */ (sp)->_h->sink((sp)->_h, (uint8_t)(((double)((x)-WBY_SLIDEPAD_NEUTRAL) / 127) * UINT8_MAX))   \
-                                                                                 : /* 0, 1, ..., 128; (WBY_SLIDEPAD_NEUTRAL - x) = 0, 1, ..., 128 */ (sp)->_h->source((sp)->_h, (uint8_t)(((double)(WBY_SLIDEPAD_NEUTRAL - (x)) / 128) * UINT8_MAX))), \
-                                                     (WBY_SLIDEPAD_NEUTRAL < (y) ? (sp)->_v->sink((sp)->_v, (uint8_t)(((double)((y)-WBY_SLIDEPAD_NEUTRAL) / 127) * UINT8_MAX))                                                                         \
-                                                                                 : (sp)->_v->source((sp)->_v, (uint8_t)(((double)(WBY_SLIDEPAD_NEUTRAL - (y)) / 128) * UINT8_MAX))))                                                                   \
+#define wby_slidepad_hold(sp, x, y) ((sp) != NULL ? ((WBY_SLIDEPAD_NEUTRAL < (x) ? /* 129, 130, ..., 255 */ (sp)->_h->set_sink((sp)->_h, (uint8_t)wby_internal_remap((x), 129, UINT8_MAX, 0, UINT8_MAX)) \
+                                                                                 : /* 128, 127, ..., 0 */ (sp)->_h->set_source((sp)->_h, (uint8_t)wby_internal_remap((x), 128, 0, 0, UINT8_MAX))),       \
+                                                     (WBY_SLIDEPAD_NEUTRAL < (y) ? (sp)->_v->set_sink((sp)->_v, (uint8_t)wby_internal_remap((y), 129, UINT8_MAX, 0, UINT8_MAX))                          \
+                                                                                 : (sp)->_v->set_source((sp)->_v, (uint8_t)wby_internal_remap((y), 128, 0, 0, UINT8_MAX))))                              \
                                                   : (void)0)
 #define wby_slidepad_release(sp) ((sp) != NULL ? wby_slidepad_hold((sp), WBY_SLIDEPAD_NEUTRAL, WBY_SLIDEPAD_NEUTRAL) \
                                                : (void)0)
-#define wby_slidepad_init(sp, h, v) (((sp) != NULL && (h) != NULL && (v) != NULL) ? ((sp)->_h = h,               \
-                                                                                     (sp)->_v = v,               \
-                                                                                     wby_slidepad_release((sp))) \
-                                                                                  : (void)0)
+#define wby_slidepad_init(sp, h, v) (((sp) != NULL &&                   \
+                                      (h) != NULL &&                    \
+                                      (v) != NULL)                      \
+                                         ? ((sp)->_h = (h),             \
+                                            (sp)->_v = (v),             \
+                                            wby_slidepad_release((sp))) \
+                                         : (void)0)
+
+    typedef struct wby_rdac_t
+    {
+        void (*set_wiper_position)(struct wby_rdac_t *rdac, uint16_t pos);
+        void (*power_on)(struct wby_rdac_t *rdac);
+        void (*shutdown)(struct wby_rdac_t *rdac);
+    } wby_rdac_t;
+
+    typedef struct wby_spst_switch_t
+    {
+        void (*on)(struct wby_spst_switch_t *sw);
+        void (*off)(struct wby_spst_switch_t *sw);
+    } wby_spst_switch_t;
 
     typedef struct wby_touchscreen_t
     {
-        wby_rdac_t *vertical;
-        wby_rdac_t *horizontal;
-        wby_spst_switch_t *sw;
+        wby_rdac_t *_h;
+        wby_rdac_t *_v;
+        wby_spst_switch_t *_sw;
     } wby_touchscreen_t;
 
-    void wby_touchscreen_hold(wby_touchscreen_t *ts, uint16_t x, uint16_t y);
-    void wby_touchscreen_release(wby_touchscreen_t *ts);
-    wby_touchscreen_t *wby_touchscreen_new(wby_rdac_t *vertical, wby_rdac_t *horizontal, wby_spst_switch_t *sw);
-    void wby_touchscreen_delete(wby_touchscreen_t *ts);
+#define WBY_TOUCHSCREEN_X_MIN ((uint16_t)1)
+#define WBY_TOUCHSCREEN_X_MAX ((uint16_t)320)
+#define WBY_TOUCHSCREEN_Y_MIN ((uint8_t)1)
+#define WBY_TOUCHSCREEN_Y_MAX ((uint8_t)240)
+#define wby_touchscreen_hold(ts, x, y) (((ts) != NULL &&                                                                                                                               \
+                                         WBY_TOUCHSCREEN_X_MIN <= (x) && (x) <= WBY_TOUCHSCREEN_X_MAX &&                                                                               \
+                                         WBY_TOUCHSCREEN_Y_MIN <= (y) && (y) <= WBY_TOUCHSCREEN_Y_MAX)                                                                                 \
+                                            ? ((ts)->_h->set_wiper_position((ts)->_h, (uint16_t)wby_internal_remap((x), WBY_TOUCHSCREEN_X_MIN, WBY_TOUCHSCREEN_X_MAX, 0, UINT16_MAX)), \
+                                               (ts)->_v->set_wiper_position((ts)->_v, (uint16_t)wby_internal_remap((y), WBY_TOUCHSCREEN_Y_MIN, WBY_TOUCHSCREEN_Y_MAX, 0, UINT16_MAX)), \
+                                               (ts)->_h->power_on((ts)->_h),                                                                                                           \
+                                               (ts)->_v->power_on((ts)->_v),                                                                                                           \
+                                               (ts)->_sw->on((ts)->_sw))                                                                                                               \
+                                            : (void)0)
+#define wby_touchscreen_release(ts) ((ts) != NULL ? ((ts)->_sw->off((ts)->_sw),    \
+                                                     (ts)->_v->shutdown((ts)->_v), \
+                                                     (ts)->_h->shutdown((ts)->_h)) \
+                                                  : (void)0)
+#define wby_touchscreen_init(ts, h, v, sw) (((ts) != NULL && (h) != NULL && (v) != NULL && (sw) != NULL) ? ((ts)->_h = (h),                \
+                                                                                                            (ts)->_v = (v),                \
+                                                                                                            (ts)->_sw = (sw),              \
+                                                                                                            wby_touchscreen_release((ts))) \
+                                                                                                         : (void)0)
 
 #ifdef __cplusplus
 }

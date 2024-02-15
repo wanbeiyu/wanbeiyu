@@ -47,22 +47,22 @@ int test_hat(void)
     assert(gpio_up != NULL);
     wby_button_t btn_up;
     wby_button_init(&btn_up, (wby_gpio_t *)gpio_up);
-    
+
     TestGPIO *gpio_right = test_gpio_new();
     assert(gpio_right != NULL);
     wby_button_t btn_right;
     wby_button_init(&btn_right, (wby_gpio_t *)gpio_right);
-    
+
     TestGPIO *gpio_down = test_gpio_new();
     assert(gpio_down != NULL);
     wby_button_t btn_down;
     wby_button_init(&btn_down, (wby_gpio_t *)gpio_down);
-    
+
     TestGPIO *gpio_left = test_gpio_new();
     assert(gpio_left != NULL);
     wby_button_t btn_left;
     wby_button_init(&btn_left, (wby_gpio_t *)gpio_left);
-    
+
     wby_hat_t hat;
     wby_hat_init(&hat, &btn_up, &btn_right, &btn_down, &btn_left);
     assert(gpio_up->state == TEST_GPIO_HI_Z &&
@@ -240,6 +240,9 @@ cleanup:
     return index;
 }
 
+static const uint16_t UINT16_MID = 0x8000U;
+static const uint16_t RDAC_TOLERANCE = 500;
+
 int test_touchscreen(void)
 {
     int index = -1;
@@ -251,12 +254,12 @@ int test_touchscreen(void)
     TestSwitch *sw = test_switch_new();
     assert(sw != NULL);
 
-    wby_touchscreen_t *ts = wby_touchscreen_new((wby_rdac_t *)v, (wby_rdac_t *)h, (wby_spst_switch_t *)sw);
-    assert(ts != NULL);
+    wby_touchscreen_t ts;
+    wby_touchscreen_init(&ts, (wby_rdac_t *)h, (wby_rdac_t *)v, (wby_spst_switch_t *)sw);
     assert(v->state == TEST_DIGIPOT_SHUTDOWN && h->state == TEST_DIGIPOT_SHUTDOWN);
     assert(sw->state == TEST_SWITCH_OFF);
 
-    wby_touchscreen_hold(ts, 0, 0);
+    wby_touchscreen_hold(&ts, 1, 1);
     if (!(v->state == TEST_DIGIPOT_POWER_ON && v->position == 0 &&
           h->state == TEST_DIGIPOT_POWER_ON && h->position == 0 &&
           sw->state == TEST_SWITCH_ON))
@@ -265,16 +268,16 @@ int test_touchscreen(void)
         goto cleanup;
     }
 
-    wby_touchscreen_hold(ts, 32767, 32767);
-    if (!(v->state == TEST_DIGIPOT_POWER_ON && v->position == 32767 &&
-          h->state == TEST_DIGIPOT_POWER_ON && h->position == 32767 &&
+    wby_touchscreen_hold(&ts, 160, 120);
+    if (!(v->state == TEST_DIGIPOT_POWER_ON && (UINT16_MID - RDAC_TOLERANCE < v->position && v->position < UINT16_MID + RDAC_TOLERANCE) &&
+          h->state == TEST_DIGIPOT_POWER_ON && (UINT16_MID - RDAC_TOLERANCE < h->position && h->position < UINT16_MID + RDAC_TOLERANCE) &&
           sw->state == TEST_SWITCH_ON))
     {
         index = 1;
         goto cleanup;
     }
 
-    wby_touchscreen_hold(ts, UINT16_MAX, UINT16_MAX);
+    wby_touchscreen_hold(&ts, 320, 240);
     if (!(v->state == TEST_DIGIPOT_POWER_ON && v->position == UINT16_MAX &&
           h->state == TEST_DIGIPOT_POWER_ON && h->position == UINT16_MAX &&
           sw->state == TEST_SWITCH_ON))
@@ -283,7 +286,7 @@ int test_touchscreen(void)
         goto cleanup;
     }
 
-    wby_touchscreen_release(ts);
+    wby_touchscreen_release(&ts);
     if (!(v->state == TEST_DIGIPOT_SHUTDOWN && h->state == TEST_DIGIPOT_SHUTDOWN && sw->state == TEST_SWITCH_OFF))
     {
         index = 3;
@@ -291,7 +294,6 @@ int test_touchscreen(void)
     }
 
 cleanup:
-    wby_touchscreen_delete(ts);
     test_switch_delete(sw);
     test_digipot_delete(h);
     test_digipot_delete(v);

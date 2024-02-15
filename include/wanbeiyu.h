@@ -132,10 +132,10 @@ extern "C"
         wby_spst_switch_t *_sw;
     } wby_touchscreen_t;
 
-#define WBY_TOUCHSCREEN_X_MIN ((uint16_t)1)
-#define WBY_TOUCHSCREEN_X_MAX ((uint16_t)320)
-#define WBY_TOUCHSCREEN_Y_MIN ((uint8_t)1)
-#define WBY_TOUCHSCREEN_Y_MAX ((uint8_t)240)
+#define WBY_TOUCHSCREEN_X_MIN ((uint16_t)0)
+#define WBY_TOUCHSCREEN_X_MAX ((uint16_t)319)
+#define WBY_TOUCHSCREEN_Y_MIN ((uint8_t)0)
+#define WBY_TOUCHSCREEN_Y_MAX ((uint8_t)239)
 #define wby_touchscreen_hold(ts, x, y) (((ts) != NULL &&                                                                                                                               \
                                          WBY_TOUCHSCREEN_X_MIN <= (x) && (x) <= WBY_TOUCHSCREEN_X_MAX &&                                                                               \
                                          WBY_TOUCHSCREEN_Y_MIN <= (y) && (y) <= WBY_TOUCHSCREEN_Y_MAX)                                                                                 \

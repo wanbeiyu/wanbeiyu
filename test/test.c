@@ -230,7 +230,7 @@ int test_touchscreen(void)
     assert(v->state == TEST_DIGIPOT_POWER_OFF && h->state == TEST_DIGIPOT_POWER_OFF);
     assert(sw->state == TEST_SWITCH_OFF);
 
-    wby_touchscreen_hold(&ts, 1, 1);
+    wby_touchscreen_hold(&ts, 0, 0);
     if (!(v->state == TEST_DIGIPOT_POWER_ON && v->position == 0 &&
           h->state == TEST_DIGIPOT_POWER_ON && h->position == 0 &&
           sw->state == TEST_SWITCH_ON))
@@ -248,7 +248,7 @@ int test_touchscreen(void)
         goto cleanup;
     }
 
-    wby_touchscreen_hold(&ts, 320, 240);
+    wby_touchscreen_hold(&ts, 319, 239);
     if (!(v->state == TEST_DIGIPOT_POWER_ON && v->position == UINT16_MAX &&
           h->state == TEST_DIGIPOT_POWER_ON && h->position == UINT16_MAX &&
           sw->state == TEST_SWITCH_ON))

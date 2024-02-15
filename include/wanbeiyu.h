@@ -8,12 +8,18 @@ extern "C"
 
 #include <stdint.h>
 
+    typedef enum wby_error_t
+    {
+        WBY_OK = 0,
+        WBY_EINVAL = 22
+    } wby_error_t;
+
 #define wby_internal_remap(v, in_min, in_max, out_min, out_max) (((double)(v) - (double)(in_min)) * ((double)(out_max) - (double)(out_min)) / ((double)(in_max) - (double)(in_min)) + (double)(out_min))
 
     typedef struct wby_gpio_t
     {
-        void (*set_low)(struct wby_gpio_t *gpio);
-        void (*set_hi_z)(struct wby_gpio_t *gpio);
+        wby_error_t (*set_low)(struct wby_gpio_t *gpio);
+        wby_error_t (*set_hi_z)(struct wby_gpio_t *gpio);
     } wby_gpio_t;
 
     typedef struct wby_button_t
@@ -22,14 +28,14 @@ extern "C"
     } wby_button_t;
 
 #define wby_button_hold(btn) ((btn) != NULL ? (btn)->_gpio->set_low((btn)->_gpio) \
-                                            : (void)0)
+                                            : WBY_EINVAL)
 #define wby_button_release(btn) ((btn) != NULL ? (btn)->_gpio->set_hi_z((btn)->_gpio) \
-                                               : (void)0)
+                                               : WBY_EINVAL)
 #define wby_button_init(btn, gpio) (((btn) != NULL &&                 \
                                      (gpio) != NULL)                  \
                                         ? ((btn)->_gpio = (gpio),     \
                                            wby_button_release((btn))) \
-                                        : (void)0)
+                                        : WBY_EINVAL)
 
     typedef struct wby_hat_t
     {

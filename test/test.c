@@ -256,7 +256,7 @@ int test_touchscreen(void)
 
     wby_touchscreen_t ts;
     wby_touchscreen_init(&ts, (wby_rdac_t *)h, (wby_rdac_t *)v, (wby_spst_switch_t *)sw);
-    assert(v->state == TEST_DIGIPOT_SHUTDOWN && h->state == TEST_DIGIPOT_SHUTDOWN);
+    assert(v->state == TEST_DIGIPOT_POWER_OFF && h->state == TEST_DIGIPOT_POWER_OFF);
     assert(sw->state == TEST_SWITCH_OFF);
 
     wby_touchscreen_hold(&ts, 1, 1);
@@ -287,7 +287,7 @@ int test_touchscreen(void)
     }
 
     wby_touchscreen_release(&ts);
-    if (!(v->state == TEST_DIGIPOT_SHUTDOWN && h->state == TEST_DIGIPOT_SHUTDOWN && sw->state == TEST_SWITCH_OFF))
+    if (!(v->state == TEST_DIGIPOT_POWER_OFF && h->state == TEST_DIGIPOT_POWER_OFF && sw->state == TEST_SWITCH_OFF))
     {
         index = 3;
         goto cleanup;

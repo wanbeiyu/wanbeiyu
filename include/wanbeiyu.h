@@ -110,7 +110,7 @@ extern "C"
     {
         void (*set_wiper_position)(struct wby_rdac_t *rdac, uint16_t pos);
         void (*power_on)(struct wby_rdac_t *rdac);
-        void (*shutdown)(struct wby_rdac_t *rdac);
+        void (*power_off)(struct wby_rdac_t *rdac);
     } wby_rdac_t;
 
     typedef struct wby_spst_switch_t
@@ -139,9 +139,9 @@ extern "C"
                                                (ts)->_v->power_on((ts)->_v),                                                                                                           \
                                                (ts)->_sw->on((ts)->_sw))                                                                                                               \
                                             : (void)0)
-#define wby_touchscreen_release(ts) ((ts) != NULL ? ((ts)->_sw->off((ts)->_sw),    \
-                                                     (ts)->_v->shutdown((ts)->_v), \
-                                                     (ts)->_h->shutdown((ts)->_h)) \
+#define wby_touchscreen_release(ts) ((ts) != NULL ? ((ts)->_sw->off((ts)->_sw),     \
+                                                     (ts)->_v->power_off((ts)->_v), \
+                                                     (ts)->_h->power_off((ts)->_h)) \
                                                   : (void)0)
 #define wby_touchscreen_init(ts, h, v, sw) (((ts) != NULL && (h) != NULL && (v) != NULL && (sw) != NULL) ? ((ts)->_h = (h),                \
                                                                                                             (ts)->_v = (v),                \

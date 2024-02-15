@@ -1,53 +1,53 @@
-#include "wanbeiyu.h"
+#ifndef TEST_GPIO_H_
+#define TEST_GPIO_H_
 
-#include <stdlib.h>
-
-typedef enum TestGPIOState
+typedef enum test_gpio_state_t
 {
-    TEST_GPIO_LOW,
-    TEST_GPIO_HIGH,
-    TEST_GPIO_HI_Z
-} TestGPIOState;
+    TEST_GPIO_STATE_LOW,
+    TEST_GPIO_STATE_HI_Z,
+} test_gpio_state_t;
 
-typedef struct TestGPIO
+typedef struct test_gpio_t
 {
     wby_gpio_t parent;
-    TestGPIOState state;
-} TestGPIO;
+    test_gpio_state_t state;
+} test_gpio_t;
 
-static wby_error_t _test_gpio_set_low(wby_gpio_t *parent)
+wby_error_t test_gpio_set_low(wby_gpio_t *gpio)
 {
-    TestGPIO *self = (TestGPIO *)parent;
-    self->state = TEST_GPIO_LOW;
-
+    ((test_gpio_t *)gpio)->state = TEST_GPIO_STATE_LOW;
     return WBY_OK;
 }
 
-static wby_error_t _test_gpio_set_hi_z(wby_gpio_t *parent)
+wby_error_t test_gpio_set_hi_z(wby_gpio_t *gpio)
 {
-    TestGPIO *self = (TestGPIO *)parent;
-    self->state = TEST_GPIO_HI_Z;
-
+    ((test_gpio_t *)gpio)->state = TEST_GPIO_STATE_HI_Z;
     return WBY_OK;
 }
 
-TestGPIO *test_gpio_new(void)
+wby_error_t test_gpio_set_hi_z_only_once(wby_gpio_t *gpio)
 {
-    TestGPIO *self = (TestGPIO *)malloc(sizeof(TestGPIO));
-    if (self == NULL)
+    static int count = 0;
+    if (0 < count)
     {
-        return NULL;
+        return WBY_EINVAL;
     }
 
-    self->parent.set_low = _test_gpio_set_low;
-    self->parent.set_hi_z = _test_gpio_set_hi_z;
-
-    self->state = TEST_GPIO_HI_Z;
-
-    return self;
+    ((test_gpio_t *)gpio)->state = TEST_GPIO_STATE_HI_Z;
+    count++;
+    return WBY_OK;
 }
 
-void test_gpio_delete(TestGPIO *self)
+wby_error_t test_gpio_einval(wby_gpio_t *gpio)
 {
-    free(self);
+    return WBY_EINVAL;
 }
+
+void test_gpio_init(test_gpio_t *gpio)
+{
+    gpio->parent.set_low = test_gpio_set_low;
+    gpio->parent.set_hi_z = test_gpio_set_hi_z;
+    gpio->state = TEST_GPIO_STATE_LOW;
+}
+
+#endif // TEST_GPIO_H_

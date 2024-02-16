@@ -20,15 +20,10 @@ int test_button_init(void)
     } test_cast_t;
 
     test_gpio_t case_1_gpio;
-    case_1_gpio.parent.set_hi_z = test_gpio_set_hi_z;
-    case_1_gpio.state = TEST_GPIO_STATE_LOW;
-
-    test_gpio_t case_2_gpio;
-    case_2_gpio.parent.set_hi_z = test_gpio_einval;
+    test_gpio_init(&case_1_gpio);
 
     test_cast_t cases[] = {{.gpio = NULL, .expected_ret = WBY_EINVAL},
-                           {.gpio = &case_1_gpio, .expected_ret = WBY_OK, .expected_state = TEST_GPIO_STATE_HI_Z},
-                           {.gpio = &case_2_gpio, .expected_ret = WBY_EINVAL}};
+                           {.gpio = &case_1_gpio, .expected_ret = WBY_OK, .expected_state = TEST_GPIO_STATE_HI_Z}};
     size_t size = sizeof(cases) / sizeof(test_cast_t);
 
     for (size_t i = 0; i < size; i++)
@@ -68,48 +63,36 @@ int test_button_hold(void)
 
     typedef struct test_cast_t
     {
+        wby_button_t *btn;
         test_gpio_t *gpio;
-        wby_error_t expected_ret;
-        test_gpio_state_t expected_state;
+        test_gpio_state_t expected;
     } test_cast_t;
 
-    test_gpio_t case_0_gpio;
-    case_0_gpio.parent.set_low = test_gpio_set_low;
-    case_0_gpio.parent.set_hi_z = test_gpio_set_hi_z;
-
     test_gpio_t case_1_gpio;
-    case_1_gpio.parent.set_low = test_gpio_einval;
-    case_1_gpio.parent.set_hi_z = test_gpio_set_hi_z;
+    test_gpio_init(&case_1_gpio);
+    wby_button_t case_1_btn;
+    assert(wby_button_init(&case_1_btn, (wby_gpio_t *)&case_1_gpio) == WBY_OK);
 
-    test_cast_t cases[] = {{.gpio = &case_0_gpio, .expected_ret = WBY_OK, .expected_state = TEST_GPIO_STATE_LOW},
-                           {.gpio = &case_1_gpio, .expected_ret = WBY_EINVAL}};
+    test_cast_t cases[] = {{.btn = NULL, .gpio = NULL},
+                           {.btn = &case_1_btn, .gpio = &case_1_gpio, .expected = TEST_GPIO_STATE_LOW}};
     size_t size = sizeof(cases) / sizeof(test_cast_t);
 
     for (size_t i = 0; i < size; i++)
     {
         test_cast_t case_ = cases[i];
 
-        wby_button_t btn;
-        assert(wby_button_init(&btn, (wby_gpio_t *)case_.gpio) == WBY_OK);
+        wby_button_hold(case_.btn);
 
-        wby_error_t actual_ret = wby_button_hold(&btn);
-
-        if (actual_ret != case_.expected_ret)
-        {
-            fprintf(stderr, "%sindex: %d, expected_ret: %d, actual_ret: %d%s\n", TEXT_RED, i, case_.expected_ret, actual_ret, TEXT_RESET);
-            ret++;
-            continue;
-        }
-        if (actual_ret != WBY_OK)
+        if (case_.gpio == NULL)
         {
             continue;
         }
 
         test_gpio_state_t actual_state = case_.gpio->state;
 
-        if (actual_state != case_.expected_state)
+        if (actual_state != case_.expected)
         {
-            fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n", TEXT_RED, i, case_.expected_state, actual_state, TEXT_RESET);
+            fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n", TEXT_RED, i, case_.expected, actual_state, TEXT_RESET);
             ret++;
         }
     }
@@ -124,46 +107,36 @@ int test_button_release(void)
 
     typedef struct test_cast_t
     {
+        wby_button_t *btn;
         test_gpio_t *gpio;
-        wby_error_t expected_ret;
-        test_gpio_state_t expected_state;
+        test_gpio_state_t expected;
     } test_cast_t;
 
-    test_gpio_t case_0_gpio;
-    case_0_gpio.parent.set_hi_z = test_gpio_set_hi_z;
-
     test_gpio_t case_1_gpio;
-    case_1_gpio.parent.set_hi_z = test_gpio_set_hi_z_only_once;
+    test_gpio_init(&case_1_gpio);
+    wby_button_t case_1_btn;
+    assert(wby_button_init(&case_1_btn, (wby_gpio_t *)&case_1_gpio) == WBY_OK);
 
-    test_cast_t cases[] = {{.gpio = &case_0_gpio, .expected_ret = WBY_OK, .expected_state = TEST_GPIO_STATE_HI_Z},
-                           {.gpio = &case_1_gpio, .expected_ret = WBY_EINVAL}};
+    test_cast_t cases[] = {{.btn = NULL, .gpio = NULL},
+                           {.btn = &case_1_btn, .gpio = &case_1_gpio, .expected = TEST_GPIO_STATE_HI_Z}};
     size_t size = sizeof(cases) / sizeof(test_cast_t);
 
     for (size_t i = 0; i < size; i++)
     {
         test_cast_t case_ = cases[i];
 
-        wby_button_t btn;
-        assert(wby_button_init(&btn, (wby_gpio_t *)case_.gpio) == WBY_OK);
+        wby_button_release(case_.btn);
 
-        wby_error_t actual_ret = wby_button_release(&btn);
-
-        if (actual_ret != case_.expected_ret)
-        {
-            fprintf(stderr, "%sindex: %d, expected_ret: %d, actual_ret: %d%s\n", TEXT_RED, i, case_.expected_ret, actual_ret, TEXT_RESET);
-            ret++;
-            continue;
-        }
-        if (actual_ret != WBY_OK)
+        if (case_.gpio == NULL)
         {
             continue;
         }
 
         test_gpio_state_t actual_state = case_.gpio->state;
 
-        if (actual_state != case_.expected_state)
+        if (actual_state != case_.expected)
         {
-            fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n", TEXT_RED, i, case_.expected_state, actual_state, TEXT_RESET);
+            fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n", TEXT_RED, i, case_.expected, actual_state, TEXT_RESET);
             ret++;
         }
     }

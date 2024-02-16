@@ -13,34 +13,14 @@ typedef struct test_gpio_t
     test_gpio_state_t state;
 } test_gpio_t;
 
-wby_error_t test_gpio_set_low(wby_gpio_t *gpio)
+void test_gpio_set_low(wby_gpio_t *gpio)
 {
     ((test_gpio_t *)gpio)->state = TEST_GPIO_STATE_LOW;
-    return WBY_OK;
 }
 
-wby_error_t test_gpio_set_hi_z(wby_gpio_t *gpio)
+void test_gpio_set_hi_z(wby_gpio_t *gpio)
 {
     ((test_gpio_t *)gpio)->state = TEST_GPIO_STATE_HI_Z;
-    return WBY_OK;
-}
-
-wby_error_t test_gpio_set_hi_z_only_once(wby_gpio_t *gpio)
-{
-    static int count = 0;
-    if (0 < count)
-    {
-        return WBY_EINVAL;
-    }
-
-    ((test_gpio_t *)gpio)->state = TEST_GPIO_STATE_HI_Z;
-    count++;
-    return WBY_OK;
-}
-
-wby_error_t test_gpio_einval(wby_gpio_t *gpio)
-{
-    return WBY_EINVAL;
 }
 
 void test_gpio_init(test_gpio_t *gpio)

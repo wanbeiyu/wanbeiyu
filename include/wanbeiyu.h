@@ -18,8 +18,8 @@ extern "C"
 
     typedef struct wby_gpio_t
     {
-        wby_error_t (*set_low)(struct wby_gpio_t *gpio);
-        wby_error_t (*set_hi_z)(struct wby_gpio_t *gpio);
+        void (*set_low)(struct wby_gpio_t *gpio);
+        void (*set_hi_z)(struct wby_gpio_t *gpio);
     } wby_gpio_t;
 
     typedef struct wby_button_t
@@ -28,13 +28,14 @@ extern "C"
     } wby_button_t;
 
 #define wby_button_hold(btn) ((btn) != NULL ? (btn)->_gpio->set_low((btn)->_gpio) \
-                                            : WBY_EINVAL)
+                                            : (void)0)
 #define wby_button_release(btn) ((btn) != NULL ? (btn)->_gpio->set_hi_z((btn)->_gpio) \
-                                               : WBY_EINVAL)
+                                               : (void)0)
 #define wby_button_init(btn, gpio) (((btn) != NULL &&                 \
                                      (gpio) != NULL)                  \
                                         ? ((btn)->_gpio = (gpio),     \
-                                           wby_button_release((btn))) \
+                                           wby_button_release((btn)), \
+                                           WBY_OK)                    \
                                         : WBY_EINVAL)
 
     typedef struct wby_hat_t

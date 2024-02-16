@@ -14,6 +14,16 @@
 
 #include "button.h"
 
+int test_hat_init(void)
+{
+    printf("* test_button_hold\n");
+    int ret = 0;
+
+    
+
+    return ret;
+}
+
 int test_hat(void)
 {
     int index = -1;

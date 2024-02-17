@@ -82,8 +82,9 @@ extern "C"
                                                          (hat)->_right = (right), \
                                                          (hat)->_down = (down),   \
                                                          (hat)->_left = (left),   \
-                                                         wby_hat_release((hat)))  \
-                                                      : (void)0)
+                                                         wby_hat_release((hat)),  \
+                                                         WBY_OK)                  \
+                                                      : WBY_EINVAL)
 
     typedef struct wby_idac_t
     {
@@ -110,8 +111,9 @@ extern "C"
                                       (v) != NULL)                      \
                                          ? ((sp)->_h = (h),             \
                                             (sp)->_v = (v),             \
-                                            wby_slidepad_release((sp))) \
-                                         : (void)0)
+                                            wby_slidepad_release((sp)), \
+                                            WBY_OK)                     \
+                                         : WBY_EINVAL)
 
     typedef struct wby_rdac_t
     {

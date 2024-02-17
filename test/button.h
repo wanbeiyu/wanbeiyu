@@ -9,8 +9,8 @@
 
 int test_button_init(void)
 {
-    printf("* test_button_init\n");
-    int ret = 0;
+    printf("  * test_button_init\n");
+    int cnt = 0;
 
     typedef struct test_cast_t
     {
@@ -28,7 +28,7 @@ int test_button_init(void)
 
     test_cast_t cases[] = {{.btn = NULL, .gpio = NULL, .expected_ret = WBY_EINVAL},
                            {.btn = &case_1_btn, .gpio = NULL, .expected_ret = WBY_EINVAL},
-                           {.btn = &case_2_btn, .gpio = &case_2_gpio, .expected_ret = WBY_OK, .expected_state = TEST_GPIO_STATE_HI_Z}};
+                           {.btn = &case_2_btn, .gpio = &case_2_gpio, .expected_ret = WBY_OK, .expected_state = TEST_GPIO_HI_Z}};
     size_t size = sizeof(cases) / sizeof(test_cast_t);
 
     for (size_t i = 0; i < size; i++)
@@ -40,9 +40,10 @@ int test_button_init(void)
         if (actual_ret != case_.expected_ret)
         {
             fprintf(stderr, "%sindex: %d, expected_ret: %d, actual_ret: %d%s\n", TEXT_RED, i, case_.expected_ret, actual_ret, TEXT_RESET);
-            ret++;
+            cnt++;
             continue;
         }
+
         if (actual_ret != WBY_OK)
         {
             continue;
@@ -53,17 +54,17 @@ int test_button_init(void)
         if (actual_state != case_.expected_state)
         {
             fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n", TEXT_RED, i, case_.expected_state, actual_state, TEXT_RESET);
-            ret++;
+            cnt++;
         }
     }
 
-    return ret;
+    return cnt;
 }
 
 int test_button_hold(void)
 {
-    printf("* test_button_hold\n");
-    int ret = 0;
+    printf("  * test_button_hold\n");
+    int cnt = 0;
 
     typedef struct test_cast_t
     {
@@ -78,7 +79,7 @@ int test_button_hold(void)
     assert(wby_button_init(&case_1_btn, (wby_gpio_t *)&case_1_gpio) == WBY_OK);
 
     test_cast_t cases[] = {{.btn = NULL, .gpio = NULL},
-                           {.btn = &case_1_btn, .gpio = &case_1_gpio, .expected = TEST_GPIO_STATE_LOW}};
+                           {.btn = &case_1_btn, .gpio = &case_1_gpio, .expected = TEST_GPIO_LOW}};
     size_t size = sizeof(cases) / sizeof(test_cast_t);
 
     for (size_t i = 0; i < size; i++)
@@ -97,17 +98,17 @@ int test_button_hold(void)
         if (actual_state != case_.expected)
         {
             fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n", TEXT_RED, i, case_.expected, actual_state, TEXT_RESET);
-            ret++;
+            cnt++;
         }
     }
 
-    return ret;
+    return cnt;
 }
 
 int test_button_release(void)
 {
-    printf("* test_button_release\n");
-    int ret = 0;
+    printf("  * test_button_release\n");
+    int cnt = 0;
 
     typedef struct test_cast_t
     {
@@ -122,7 +123,7 @@ int test_button_release(void)
     assert(wby_button_init(&case_1_btn, (wby_gpio_t *)&case_1_gpio) == WBY_OK);
 
     test_cast_t cases[] = {{.btn = NULL, .gpio = NULL},
-                           {.btn = &case_1_btn, .gpio = &case_1_gpio, .expected = TEST_GPIO_STATE_HI_Z}};
+                           {.btn = &case_1_btn, .gpio = &case_1_gpio, .expected = TEST_GPIO_HI_Z}};
     size_t size = sizeof(cases) / sizeof(test_cast_t);
 
     for (size_t i = 0; i < size; i++)
@@ -141,20 +142,23 @@ int test_button_release(void)
         if (actual_state != case_.expected)
         {
             fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n", TEXT_RED, i, case_.expected, actual_state, TEXT_RESET);
-            ret++;
+            cnt++;
         }
     }
 
-    return ret;
+    return cnt;
 }
 
 int test_button(void)
 {
-    int ret = 0;
-    ret += test_button_init();
-    ret += test_button_hold();
-    ret += test_button_release();
-    return ret;
+    printf("* test_button\n");
+    int cnt = 0;
+
+    cnt += test_button_init();
+    cnt += test_button_hold();
+    cnt += test_button_release();
+
+    return cnt;
 }
 
 #endif // TEST_BUTTON_H_

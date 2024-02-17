@@ -8,215 +8,146 @@
 #define TEXT_RESET "\e[0m"
 
 #include "test_gpio.h"
-#include "test_dac.h"
+#include "test_idac.h"
 #include "test_digipot.h"
 #include "test_switch.h"
 
 #include "button.h"
+#include "hat.h"
 
-int test_hat_init(void)
+int test_slidepad_init(void)
 {
-    printf("* test_button_hold\n");
-    int ret = 0;
+    printf("  * test_slidepad_init\n");
+    int cnt = 0;
 
-    
-
-    return ret;
-}
-
-int test_hat(void)
-{
-    int index = -1;
-
-    test_gpio_t gpio_up;
-    test_gpio_init(&gpio_up);
-    wby_button_t btn_up;
-    wby_button_init(&btn_up, (wby_gpio_t *)&gpio_up);
-
-    test_gpio_t gpio_right;
-    test_gpio_init(&gpio_right);
-    wby_button_t btn_right;
-    wby_button_init(&btn_right, (wby_gpio_t *)&gpio_right);
-
-    test_gpio_t gpio_down;
-    test_gpio_init(&gpio_down);
-    wby_button_t btn_down;
-    wby_button_init(&btn_down, (wby_gpio_t *)&gpio_down);
-
-    test_gpio_t gpio_left;
-    test_gpio_init(&gpio_left);
-    wby_button_t btn_left;
-    wby_button_init(&btn_left, (wby_gpio_t *)&gpio_left);
-
-    wby_hat_t hat;
-    wby_hat_init(&hat, &btn_up, &btn_right, &btn_down, &btn_left);
-    assert(gpio_up.state == TEST_GPIO_STATE_HI_Z &&
-           gpio_right.state == TEST_GPIO_STATE_HI_Z &&
-           gpio_down.state == TEST_GPIO_STATE_HI_Z &&
-           gpio_left.state == TEST_GPIO_STATE_HI_Z);
-
-    wby_hat_hold(&hat, WBY_HAT_UP);
-    if (!(gpio_up.state == TEST_GPIO_STATE_LOW &&
-          gpio_right.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_down.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_left.state == TEST_GPIO_STATE_HI_Z))
+    typedef struct test_cast_t
     {
-        index = 0;
-        goto cleanup;
+        wby_slidepad_t *sp;
+        test_idac_t *h;
+        test_idac_t *v;
+        wby_error_t expected_ret;
+    } test_cast_t;
+
+    wby_slidepad_t case_1_sp;
+
+    wby_slidepad_t case_2_sp;
+    test_idac_t case_2_h;
+    test_idac_init(&case_2_h);
+
+    wby_slidepad_t case_3_sp;
+    test_idac_t case_3_v;
+    test_idac_init(&case_3_v);
+
+    wby_slidepad_t case_4_sp;
+    test_idac_t case_4_h;
+    test_idac_init(&case_4_h);
+    test_idac_t case_4_v;
+    test_idac_init(&case_4_v);
+
+    test_cast_t cases[] = {{.sp = NULL, .h = NULL, .v = NULL, .expected_ret = WBY_EINVAL},
+                           {.sp = &case_1_sp, .h = NULL, .v = NULL, .expected_ret = WBY_EINVAL},
+                           {.sp = &case_2_sp, .h = &case_2_h, .v = NULL, .expected_ret = WBY_EINVAL},
+                           {.sp = &case_3_sp, .h = NULL, .v = &case_3_v, .expected_ret = WBY_EINVAL},
+                           {.sp = &case_4_sp, .h = &case_4_h, .v = &case_4_h, .expected_ret = WBY_OK}};
+    size_t size = sizeof(cases) / sizeof(test_cast_t);
+
+    for (size_t i = 0; i < size; i++)
+    {
+        test_cast_t case_ = cases[i];
+
+        wby_error_t actual_ret = wby_slidepad_init(case_.sp, (wby_idac_t *)case_.h, (wby_idac_t *)case_.v);
+
+        if (actual_ret != case_.expected_ret)
+        {
+            fprintf(stderr, "%sindex: %d, expected_ret: %d, actual_ret: %d%s\n", TEXT_RED, i, case_.expected_ret, actual_ret, TEXT_RESET);
+            cnt++;
+            continue;
+        }
+
+        if (actual_ret != WBY_OK)
+        {
+            continue;
+        }
+
+        test_gpio_state_t actual_h_state = case_.h->state;
+        uint8_t actual_h_value = case_.h->value;
+        test_gpio_state_t actual_v_state = case_.v->state;
+        uint8_t actual_v_value = case_.v->value;
+
+        if (actual_h_state != TEST_IDAC_SOURCE ||
+            actual_h_value != 0 ||
+            actual_v_state != TEST_IDAC_SOURCE ||
+            actual_v_value != 0)
+        {
+            fprintf(stderr, "%sindex: %d,\n"
+                            "expected_h_state: %d, actual_h_state: %d, expected_h_value: %d, actual_h_value: %d\n"
+                            "expected_v_state: %d, actual_v_state: %d, expected_v_value: %d, actual_v_value: %d%s\n",
+                    TEXT_RED, i,
+                    TEST_IDAC_SOURCE, actual_h_state, 0, actual_h_value,
+                    TEST_IDAC_SOURCE, actual_v_state, 0, actual_v_value,
+                    TEXT_RESET);
+            cnt++;
+        }
     }
 
-    wby_hat_hold(&hat, WBY_HAT_UPRIGHT);
-    if (!(gpio_up.state == TEST_GPIO_STATE_LOW &&
-          gpio_right.state == TEST_GPIO_STATE_LOW &&
-          gpio_down.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_left.state == TEST_GPIO_STATE_HI_Z))
-    {
-        index = 1;
-        goto cleanup;
-    }
-
-    wby_hat_hold(&hat, WBY_HAT_RIGHT);
-    if (!(gpio_up.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_right.state == TEST_GPIO_STATE_LOW &&
-          gpio_down.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_left.state == TEST_GPIO_STATE_HI_Z))
-    {
-        index = 2;
-        goto cleanup;
-    }
-
-    wby_hat_hold(&hat, WBY_HAT_DOWNRIGHT);
-    if (!(gpio_up.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_right.state == TEST_GPIO_STATE_LOW &&
-          gpio_down.state == TEST_GPIO_STATE_LOW &&
-          gpio_left.state == TEST_GPIO_STATE_HI_Z))
-    {
-        index = 3;
-        goto cleanup;
-    }
-
-    wby_hat_hold(&hat, WBY_HAT_DOWN);
-    if (!(gpio_up.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_right.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_down.state == TEST_GPIO_STATE_LOW &&
-          gpio_left.state == TEST_GPIO_STATE_HI_Z))
-    {
-        index = 4;
-        goto cleanup;
-    }
-
-    wby_hat_hold(&hat, WBY_HAT_DOWNLEFT);
-    if (!(gpio_up.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_right.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_down.state == TEST_GPIO_STATE_LOW &&
-          gpio_left.state == TEST_GPIO_STATE_LOW))
-    {
-        index = 5;
-        goto cleanup;
-    }
-
-    wby_hat_hold(&hat, WBY_HAT_LEFT);
-    if (!(gpio_up.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_right.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_down.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_left.state == TEST_GPIO_STATE_LOW))
-    {
-        index = 6;
-        goto cleanup;
-    }
-
-    wby_hat_hold(&hat, WBY_HAT_UPLEFT);
-    if (!(gpio_up.state == TEST_GPIO_STATE_LOW &&
-          gpio_right.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_down.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_left.state == TEST_GPIO_STATE_LOW))
-    {
-        index = 7;
-        goto cleanup;
-    }
-
-    wby_hat_hold(&hat, WBY_HAT_NEUTRAL);
-    if (!(gpio_up.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_right.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_down.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_left.state == TEST_GPIO_STATE_HI_Z))
-    {
-        index = 8;
-        goto cleanup;
-    }
-
-    wby_hat_release(&hat);
-    if (!(gpio_up.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_right.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_down.state == TEST_GPIO_STATE_HI_Z &&
-          gpio_left.state == TEST_GPIO_STATE_HI_Z))
-    {
-        index = 9;
-        goto cleanup;
-    }
-
-cleanup:
-
-    return index;
+    return cnt;
 }
 
 int test_slidepad(void)
 {
     int index = -1;
 
-    TestDAC *h = test_dac_new();
-    assert(h != NULL);
-    TestDAC *v = test_dac_new();
-    assert(v != NULL);
+    test_idac_t h;
+    test_idac_init(&h);
+    test_idac_t v;
+    test_idac_init(&v);
 
     wby_slidepad_t sp;
-    wby_slidepad_init(&sp, (wby_idac_t *)h, (wby_idac_t *)v);
-    assert(v->state == TEST_DAC_SOURCE && v->value == 0 &&
-           h->state == TEST_DAC_SOURCE && h->value == 0);
+    wby_slidepad_init(&sp, (wby_idac_t *)&h, (wby_idac_t *)&v);
+    assert(v.state == TEST_IDAC_SOURCE && v.value == 0 &&
+           h.state == TEST_IDAC_SOURCE && h.value == 0);
 
     wby_slidepad_hold(&sp, 0, 0);
-    if (!(v->state == TEST_DAC_SOURCE && v->value == UINT8_MAX &&
-          h->state == TEST_DAC_SOURCE && h->value == UINT8_MAX))
+    if (!(v.state == TEST_IDAC_SOURCE && v.value == UINT8_MAX &&
+          h.state == TEST_IDAC_SOURCE && h.value == UINT8_MAX))
     {
         index = 0;
         goto cleanup;
     }
 
     wby_slidepad_hold(&sp, 0, UINT8_MAX);
-    if (!(v->state == TEST_DAC_SINK && v->value == UINT8_MAX &&
-          h->state == TEST_DAC_SOURCE && h->value == UINT8_MAX))
+    if (!(v.state == TEST_IDAC_SINK && v.value == UINT8_MAX &&
+          h.state == TEST_IDAC_SOURCE && h.value == UINT8_MAX))
     {
         index = 1;
         goto cleanup;
     }
 
     wby_slidepad_hold(&sp, UINT8_MAX, UINT8_MAX);
-    if (!(v->state == TEST_DAC_SINK && v->value == UINT8_MAX &&
-          h->state == TEST_DAC_SINK && h->value == UINT8_MAX))
+    if (!(v.state == TEST_IDAC_SINK && v.value == UINT8_MAX &&
+          h.state == TEST_IDAC_SINK && h.value == UINT8_MAX))
     {
         index = 2;
         goto cleanup;
     }
 
     wby_slidepad_hold(&sp, UINT8_MAX, 0);
-    if (!(v->state == TEST_DAC_SOURCE && v->value == UINT8_MAX &&
-          h->state == TEST_DAC_SINK && h->value == UINT8_MAX))
+    if (!(v.state == TEST_IDAC_SOURCE && v.value == UINT8_MAX &&
+          h.state == TEST_IDAC_SINK && h.value == UINT8_MAX))
     {
         index = 3;
         goto cleanup;
     }
 
     wby_slidepad_release(&sp);
-    if (!(v->state == TEST_DAC_SOURCE && v->value == 0 &&
-          h->state == TEST_DAC_SOURCE && h->value == 0))
+    if (!(v.state == TEST_IDAC_SOURCE && v.value == 0 &&
+          h.state == TEST_IDAC_SOURCE && h.value == 0))
     {
         index = 4;
         goto cleanup;
     }
 
 cleanup:
-    test_dac_delete(h);
-    test_dac_delete(v);
 
     return index;
 }
@@ -286,12 +217,6 @@ int main(void)
 {
     int index;
 
-    index = test_hat();
-    if (0 <= index)
-    {
-        fprintf(stderr, "[test_hat] Assertion failed on index %d", index);
-        return 1;
-    }
     index = test_slidepad();
     if (0 <= index)
     {
@@ -305,17 +230,20 @@ int main(void)
         return 1;
     }
 
-    int ret = 0;
-    ret += test_button();
+    int cnt = 0;
 
-    if (ret == 0)
+    cnt += test_button();
+    cnt += test_hat();
+    cnt += test_slidepad_init();
+
+    if (cnt == 0)
     {
         printf("%sOK%s\n", TEXT_GREEN, TEXT_RESET);
         return 0;
     }
     else
     {
-        fprintf(stderr, "%s%d errors found%s", TEXT_RED, ret, TEXT_RESET);
+        fprintf(stderr, "%s%d errors found%s\n", TEXT_RED, cnt, TEXT_RESET);
         return 1;
     }
 }

@@ -106,12 +106,12 @@ int test_touchscreen_hold(void)
         test_switch_state_t expected_sw_state;
     } test_case_t;
 
-    test_case_t cases[] = {{.x = 0, /*  */ .y = 0, /*  */ .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = 0, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = 0, .expected_sw_state = TEST_SWITCH_ON},
-                           {.x = 160, /**/ .y = 120, /**/ .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = TEST_UINT16_MID, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = TEST_UINT16_MID, .expected_sw_state = TEST_SWITCH_ON},
-                           {.x = 319, /**/ .y = 239, /**/ .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = UINT16_MAX, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = UINT16_MAX, .expected_sw_state = TEST_SWITCH_ON},
-                           {.x = 320, /**/ .y = 0, /*  */ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF},
-                           {.x = 0, /*  */ .y = 240, /**/ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF},
-                           {.x = 320, /**/ .y = 240, /**/ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF}};
+    test_case_t cases[] = {{.x = WBY_TOUCHSCREEN_X_MIN, .y = WBY_TOUCHSCREEN_Y_MIN, .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = 0, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = 0, .expected_sw_state = TEST_SWITCH_ON},
+                           {.x = 160, /*             */ .y = 120, /*             */ .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = TEST_UINT16_MID, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = TEST_UINT16_MID, .expected_sw_state = TEST_SWITCH_ON},
+                           {.x = WBY_TOUCHSCREEN_X_MAX, .y = WBY_TOUCHSCREEN_Y_MAX, .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = UINT16_MAX, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = UINT16_MAX, .expected_sw_state = TEST_SWITCH_ON},
+                           {.x = 320, /*             */ .y = 0, /*               */ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF},
+                           {.x = 0, /*               */ .y = 240, /*             */ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF},
+                           {.x = 320, /*             */ .y = 240, /*             */ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF}};
     size_t size = sizeof(cases) / sizeof(test_case_t);
 
     wby_touchscreen_t *ts_null = NULL;

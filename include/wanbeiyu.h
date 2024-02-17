@@ -152,12 +152,16 @@ extern "C"
                                                      (ts)->_v->power_off((ts)->_v), \
                                                      (ts)->_h->power_off((ts)->_h)) \
                                                   : (void)0)
-#define wby_touchscreen_init(ts, h, v, sw) (((ts) != NULL && (h) != NULL && (v) != NULL && (sw) != NULL) ? ((ts)->_h = (h),                \
-                                                                                                            (ts)->_v = (v),                \
-                                                                                                            (ts)->_sw = (sw),              \
-                                                                                                            wby_touchscreen_release((ts)), \
-                                                                                                            WBY_OK)                        \
-                                                                                                         : WBY_EINVAL)
+#define wby_touchscreen_init(ts, h, v, sw) (((ts) != NULL &&                      \
+                                             (h) != NULL &&                       \
+                                             (v) != NULL &&                       \
+                                             (sw) != NULL)                        \
+                                                ? ((ts)->_h = (h),                \
+                                                   (ts)->_v = (v),                \
+                                                   (ts)->_sw = (sw),              \
+                                                   wby_touchscreen_release((ts)), \
+                                                   WBY_OK)                        \
+                                                : WBY_EINVAL)
 
 #ifdef __cplusplus
 }

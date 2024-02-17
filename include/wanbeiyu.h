@@ -155,8 +155,9 @@ extern "C"
 #define wby_touchscreen_init(ts, h, v, sw) (((ts) != NULL && (h) != NULL && (v) != NULL && (sw) != NULL) ? ((ts)->_h = (h),                \
                                                                                                             (ts)->_v = (v),                \
                                                                                                             (ts)->_sw = (sw),              \
-                                                                                                            wby_touchscreen_release((ts))) \
-                                                                                                         : (void)0)
+                                                                                                            wby_touchscreen_release((ts)), \
+                                                                                                            WBY_OK)                        \
+                                                                                                         : WBY_EINVAL)
 
 #ifdef __cplusplus
 }

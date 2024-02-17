@@ -2,7 +2,7 @@
 #define TEST_HAT_H_
 
 #include "wanbeiyu.h"
-#include "test_gpio.h"
+#include "test.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -136,6 +136,9 @@ int test_hat_hold(void)
                            {.dir = 0b101101 /* Bits higher than the fourth digit are ignored. */, .expected_up_state = TEST_GPIO_LOW, .expected_right_state = TEST_GPIO_LOW, .expected_down_state = TEST_GPIO_HI_Z, .expected_left_state = TEST_GPIO_LOW}};
     size_t size = sizeof(cases) / sizeof(test_cast_t);
 
+    wby_hat_t *hat_null = NULL;
+    wby_hat_hold(hat_null, WBY_HAT_NEUTRAL); /* Expected that nothing will happen. */
+
     for (size_t i = 0; i < size; i++)
     {
         test_cast_t case_ = cases[i];
@@ -147,7 +150,6 @@ int test_hat_hold(void)
             test_gpio_init(&gpios[j]);
             assert(wby_button_init(&btns[j], (wby_gpio_t *)&gpios[j]) == WBY_OK);
         }
-
         wby_hat_t hat;
         assert(wby_hat_init(&hat, &btns[0], &btns[1], &btns[2], &btns[3]) == WBY_OK);
 

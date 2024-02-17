@@ -2,7 +2,7 @@
 #define TEST_BUTTON_H_
 
 #include "wanbeiyu.h"
-#include "test_gpio.h"
+#include "test.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -68,32 +68,27 @@ int test_button_hold(void)
 
     typedef struct test_cast_t
     {
-        wby_button_t *btn;
-        test_gpio_t *gpio;
         test_gpio_state_t expected;
     } test_cast_t;
 
-    test_gpio_t case_1_gpio;
-    test_gpio_init(&case_1_gpio);
-    wby_button_t case_1_btn;
-    assert(wby_button_init(&case_1_btn, (wby_gpio_t *)&case_1_gpio) == WBY_OK);
-
-    test_cast_t cases[] = {{.btn = NULL, .gpio = NULL},
-                           {.btn = &case_1_btn, .gpio = &case_1_gpio, .expected = TEST_GPIO_LOW}};
+    test_cast_t cases[] = {{.expected = TEST_GPIO_LOW}};
     size_t size = sizeof(cases) / sizeof(test_cast_t);
+
+    wby_button_t *btn_null = NULL;
+    wby_button_hold(btn_null); /* Expected that nothing will happen. */
 
     for (size_t i = 0; i < size; i++)
     {
         test_cast_t case_ = cases[i];
 
-        wby_button_hold(case_.btn);
+        test_gpio_t gpio;
+        test_gpio_init(&gpio);
+        wby_button_t btn;
+        assert(wby_button_init(&btn, (wby_gpio_t *)&gpio) == WBY_OK);
 
-        if (case_.gpio == NULL)
-        {
-            continue;
-        }
+        wby_button_hold(&btn);
 
-        test_gpio_state_t actual_state = case_.gpio->state;
+        test_gpio_state_t actual_state = gpio.state;
 
         if (actual_state != case_.expected)
         {

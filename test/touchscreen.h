@@ -9,7 +9,6 @@
 
 int test_touchscreen_init(void)
 {
-    printf("  * test_touchscreen_init\n");
     int cnt = 0;
 
     typedef struct test_case_t
@@ -94,7 +93,6 @@ int test_touchscreen_init(void)
 
 int test_touchscreen_hold(void)
 {
-    printf("  * test_touchscreen_hold\n");
     int cnt = 0;
 
     typedef struct test_case_t
@@ -185,7 +183,6 @@ int test_touchscreen_hold(void)
 
 int test_touchscreen_release(void)
 {
-    printf("  * test_touchscreen_release\n");
     int cnt = 0;
 
     wby_touchscreen_t *ts_null = NULL;
@@ -230,8 +227,11 @@ int test_touchscreen(void)
     printf("* test_touchscreen\n");
     int cnt = 0;
 
+    printf("  * test_touchscreen_init\n");
     cnt += test_touchscreen_init();
+    printf("  * test_touchscreen_hold\n");
     cnt += test_touchscreen_hold();
+    printf("  * test_touchscreen_release\n");
     cnt += test_touchscreen_release();
 
     return cnt;

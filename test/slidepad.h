@@ -9,7 +9,6 @@
 
 int test_slidepad_init(void)
 {
-    printf("  * test_slidepad_init\n");
     int cnt = 0;
 
     typedef struct test_case_t
@@ -20,27 +19,23 @@ int test_slidepad_init(void)
         wby_error_t expected_ret;
     } test_case_t;
 
-    wby_slidepad_t case_1_sp;
+    wby_slidepad_t sp[8];
+    test_idac_t h[8];
+    test_idac_t v[8];
+    for (size_t i = 0; i < 8; i++)
+    {
+        test_idac_init(&h[i]);
+        test_idac_init(&v[i]);
+    }
 
-    wby_slidepad_t case_2_sp;
-    test_idac_t case_2_h;
-    test_idac_init(&case_2_h);
-
-    wby_slidepad_t case_3_sp;
-    test_idac_t case_3_v;
-    test_idac_init(&case_3_v);
-
-    wby_slidepad_t case_4_sp;
-    test_idac_t case_4_h;
-    test_idac_init(&case_4_h);
-    test_idac_t case_4_v;
-    test_idac_init(&case_4_v);
-
-    test_case_t cases[] = {{.sp = NULL, .h = NULL, .v = NULL, .expected_ret = WBY_EINVAL},
-                           {.sp = &case_1_sp, .h = NULL, .v = NULL, .expected_ret = WBY_EINVAL},
-                           {.sp = &case_2_sp, .h = &case_2_h, .v = NULL, .expected_ret = WBY_EINVAL},
-                           {.sp = &case_3_sp, .h = NULL, .v = &case_3_v, .expected_ret = WBY_EINVAL},
-                           {.sp = &case_4_sp, .h = &case_4_h, .v = &case_4_h, .expected_ret = WBY_OK}};
+    test_case_t cases[] = {{.sp = NULL, /*  */ .h = NULL, /* */ .v = NULL, /* */ .expected_ret = WBY_EINVAL},
+                           {.sp = &sp[1], /**/ .h = NULL, /* */ .v = NULL, /* */ .expected_ret = WBY_EINVAL},
+                           {.sp = NULL, /*  */ .h = &h[2], /**/ .v = NULL, /* */ .expected_ret = WBY_EINVAL},
+                           {.sp = &sp[3], /**/ .h = &h[3], /**/ .v = NULL, /* */ .expected_ret = WBY_EINVAL},
+                           {.sp = NULL, /*  */ .h = NULL, /* */ .v = &v[4], /**/ .expected_ret = WBY_EINVAL},
+                           {.sp = &sp[5], /**/ .h = NULL, /* */ .v = &v[5], /**/ .expected_ret = WBY_EINVAL},
+                           {.sp = NULL, /*  */ .h = &h[6], /**/ .v = &v[6], /**/ .expected_ret = WBY_EINVAL},
+                           {.sp = &sp[7], /**/ .h = &h[7], /**/ .v = &v[7], /**/ .expected_ret = WBY_OK}};
     size_t size = sizeof(cases) / sizeof(test_case_t);
 
     for (size_t i = 0; i < size; i++)
@@ -87,7 +82,6 @@ int test_slidepad_init(void)
 
 int test_slidepad_hold(void)
 {
-    printf("  * test_slidepad_hold\n");
     int cnt = 0;
 
     typedef struct test_case_t
@@ -147,52 +141,33 @@ int test_slidepad_hold(void)
 
 int test_slidepad_release(void)
 {
-    printf("  * test_slidepad_release\n");
     int cnt = 0;
 
-    typedef struct test_case_t
+    wby_slidepad_t *sp_null = NULL;
+    wby_slidepad_release(sp_null); /* Expected that nothing will happen. */
+
+    test_idac_t h;
+    test_idac_init(&h);
+    test_idac_t v;
+    test_idac_init(&v);
+    wby_slidepad_t sp;
+    assert(wby_slidepad_init(&sp, (wby_idac_t *)&h, (wby_idac_t *)&v) == WBY_OK);
+
+    wby_slidepad_release(&sp);
+
+    if (h.state != TEST_IDAC_SOURCE ||
+        h.value != 0 ||
+        v.state != TEST_IDAC_SOURCE ||
+        v.value != 0)
     {
-        wby_slidepad_t *sp;
-        test_idac_t *h;
-        test_idac_t *v;
-    } test_case_t;
-
-    test_idac_t case_1_h;
-    test_idac_init(&case_1_h);
-    test_idac_t case_1_v;
-    test_idac_init(&case_1_v);
-    wby_slidepad_t case_1_sp;
-    assert(wby_slidepad_init(&case_1_sp, (wby_idac_t *)&case_1_h, (wby_idac_t *)&case_1_v) == WBY_OK);
-
-    test_case_t cases[] = {{.sp = NULL, .h = NULL, .v = NULL},
-                           {.sp = &case_1_sp, .h = &case_1_h, .v = &case_1_v}};
-    size_t size = sizeof(cases) / sizeof(test_case_t);
-
-    for (size_t i = 0; i < size; i++)
-    {
-        test_case_t case_ = cases[i];
-
-        wby_slidepad_release(case_.sp);
-
-        if (case_.h == NULL || case_.v == NULL)
-        {
-            continue;
-        }
-
-        if (case_.h->state != TEST_IDAC_SOURCE ||
-            case_.h->value != 0 ||
-            case_.v->state != TEST_IDAC_SOURCE ||
-            case_.v->value != 0)
-        {
-            fprintf(stderr, "%sindex: %d,\n"
-                            "  expected_h_state: %d, actual_h_state: %d, expected_h_value: %d, actual_h_value: %d,\n"
-                            "  expected_v_state: %d, actual_v_state: %d, expected_v_value: %d, actual_v_value: %d%s\n",
-                    TEXT_RED, i,
-                    TEST_IDAC_SOURCE, case_.h->state, 0, case_.h->value,
-                    TEST_IDAC_SOURCE, case_.v->state, 0, case_.v->value,
-                    TEXT_RESET);
-            cnt++;
-        }
+        fprintf(stderr, "%sindex: %d,\n"
+                        "  expected_h_state: %d, actual_h_state: %d, expected_h_value: %d, actual_h_value: %d,\n"
+                        "  expected_v_state: %d, actual_v_state: %d, expected_v_value: %d, actual_v_value: %d%s\n",
+                TEXT_RED, 0,
+                TEST_IDAC_SOURCE, h.state, 0, h.value,
+                TEST_IDAC_SOURCE, v.state, 0, v.value,
+                TEXT_RESET);
+        cnt++;
     }
 
     return cnt;
@@ -203,8 +178,11 @@ int test_slidepad(void)
     printf("* test_slidepad\n");
     int cnt = 0;
 
+    printf("  * test_slidepad_init\n");
     cnt += test_slidepad_init();
+    printf("  * test_slidepad_hold\n");
     cnt += test_slidepad_hold();
+    printf("  * test_slidepad_release\n");
     cnt += test_slidepad_release();
 
     return cnt;

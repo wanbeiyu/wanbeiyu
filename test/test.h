@@ -26,6 +26,15 @@
         continue;                                                                                                 \
     }
 
+#define TEST_ASSERT_EQUAL_WANBEIYU_ERROR_PRE_RET(expected_ret, actual_ret)                                        \
+    if ((expected_ret) != (actual_ret))                                                                           \
+    {                                                                                                             \
+        fprintf(stderr, "%sindex: %d-pre, expected_ret: %s, actual_ret: %s%s\n",                                  \
+                TEXT_RED, i, TEST_WANBEIYU_ERROR((expected_ret)), TEST_WANBEIYU_ERROR((actual_ret)), TEXT_RESET); \
+        cnt++;                                                                                                    \
+        continue;                                                                                                 \
+    }
+
 #define TEST_UINT16_MID 0x8000U
 #define TEST_RDAC_TOLERANCE 500
 
@@ -35,20 +44,26 @@ typedef enum test_gpio_state_t
     TEST_GPIO_HI_Z,
 } test_gpio_state_t;
 
+#define TEST_GPIO_STATE(s) ((s) == TEST_GPIO_LOW    ? TEST_VAR_NAME(TEST_GPIO_LOW)  \
+                            : (s) == TEST_GPIO_HI_Z ? TEST_VAR_NAME(TEST_GPIO_HI_Z) \
+                                                    : "")
+
 typedef struct test_gpio_t
 {
     wanbeiyu_gpio_t parent;
     test_gpio_state_t state;
 } test_gpio_t;
 
-void test_gpio_set_low(wanbeiyu_gpio_t *gpio)
+wanbeiyu_error_t test_gpio_set_low(wanbeiyu_gpio_t *gpio)
 {
     ((test_gpio_t *)gpio)->state = TEST_GPIO_LOW;
+    return WANBEIYU_OK;
 }
 
-void test_gpio_set_hi_z(wanbeiyu_gpio_t *gpio)
+wanbeiyu_error_t test_gpio_set_hi_z(wanbeiyu_gpio_t *gpio)
 {
     ((test_gpio_t *)gpio)->state = TEST_GPIO_HI_Z;
+    return WANBEIYU_OK;
 }
 
 void test_gpio_init(test_gpio_t *gpio)

@@ -11,6 +11,7 @@ extern "C"
     typedef enum wanbeiyu_error_t
     {
         WANBEIYU_OK = 0,
+        WANBEIYU_EIO = 5,
         WANBEIYU_EINVAL = 22
     } wanbeiyu_error_t;
 
@@ -18,8 +19,8 @@ extern "C"
 
     typedef struct wanbeiyu_gpio_t
     {
-        void (*set_low)(struct wanbeiyu_gpio_t *gpio);
-        void (*set_hi_z)(struct wanbeiyu_gpio_t *gpio);
+        wanbeiyu_error_t (*set_low)(struct wanbeiyu_gpio_t *gpio);
+        wanbeiyu_error_t (*set_hi_z)(struct wanbeiyu_gpio_t *gpio);
     } wanbeiyu_gpio_t;
 
     typedef struct wanbeiyu_button_t
@@ -27,15 +28,16 @@ extern "C"
         wanbeiyu_gpio_t *gpio_;
     } wanbeiyu_button_t;
 
-#define wanbeiyu_button_hold(btn) ((btn) != NULL ? (btn)->gpio_->set_low((btn)->gpio_) \
-                                                 : (void)0)
-#define wanbeiyu_button_release(btn) ((btn) != NULL ? (btn)->gpio_->set_hi_z((btn)->gpio_) \
-                                                    : (void)0)
-#define wanbeiyu_button_init(btn, gpio) (((btn) != NULL &&                      \
-                                          (gpio) != NULL)                       \
-                                             ? ((btn)->gpio_ = (gpio),          \
-                                                wanbeiyu_button_release((btn)), \
-                                                WANBEIYU_OK)                    \
+#define wanbeiyu_button_hold(btn) ((btn) != NULL                             \
+                                       ? (btn)->gpio_->set_low((btn)->gpio_) \
+                                       : WANBEIYU_EINVAL)
+#define wanbeiyu_button_release(btn) ((btn) != NULL                              \
+                                          ? (btn)->gpio_->set_hi_z((btn)->gpio_) \
+                                          : WANBEIYU_EINVAL)
+#define wanbeiyu_button_init(btn, gpio) (((btn) != NULL &&             \
+                                          (gpio) != NULL)              \
+                                             ? ((btn)->gpio_ = (gpio), \
+                                                WANBEIYU_OK)           \
                                              : WANBEIYU_EINVAL)
 
     typedef struct wanbeiyu_hat_t

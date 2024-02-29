@@ -9,43 +9,35 @@
 
 int test_button_init(void)
 {
+    printf("  * %s\n", __func__);
     int cnt = 0;
 
-    typedef struct test_cast_t
+    typedef struct test_case_t
     {
-        wby_button_t *btn;
+        wanbeiyu_button_t *btn;
         test_gpio_t *gpio;
-        wby_error_t expected_ret;
-        test_gpio_state_t expected_state;
-    } test_cast_t;
 
-    wby_button_t btn[4];
+        wanbeiyu_error_t expected_ret;
+        test_gpio_state_t expected_state;
+    } test_case_t;
+
+    wanbeiyu_button_t btn[4];
     test_gpio_t gpio[4];
     for (size_t i = 0; i < 4; i++)
     {
         test_gpio_init(&gpio[i]);
     }
 
-    test_cast_t cases[] = {{.btn = NULL, /*   */ .gpio = NULL, /*    */ .expected_ret = WBY_EINVAL},
-                           {.btn = &btn[1], /**/ .gpio = NULL, /*    */ .expected_ret = WBY_EINVAL},
-                           {.btn = NULL, /*   */ .gpio = &gpio[2], /**/ .expected_ret = WBY_EINVAL},
-                           {.btn = &btn[3], /**/ .gpio = &gpio[3], /**/ .expected_ret = WBY_OK, .expected_state = TEST_GPIO_HI_Z}};
-    size_t size = sizeof(cases) / sizeof(test_cast_t);
+    test_case_t cases[] = {{.btn = NULL, /*   */ .gpio = NULL, /*    */ .expected_ret = WANBEIYU_EINVAL},
+                           {.btn = &btn[1], /**/ .gpio = NULL, /*    */ .expected_ret = WANBEIYU_EINVAL},
+                           {.btn = NULL, /*   */ .gpio = &gpio[2], /**/ .expected_ret = WANBEIYU_EINVAL},
+                           {.btn = &btn[3], /**/ .gpio = &gpio[3], /**/ .expected_ret = WANBEIYU_OK, .expected_state = TEST_GPIO_HI_Z}};
 
-    for (size_t i = 0; i < size; i++)
+    TEST_FOR(cases)
     {
-        test_cast_t case_ = cases[i];
-
-        wby_error_t actual_ret = wby_button_init(case_.btn, (wby_gpio_t *)case_.gpio);
-
-        if (actual_ret != case_.expected_ret)
-        {
-            fprintf(stderr, "%sindex: %d, expected_ret: %d, actual_ret: %d%s\n", TEXT_RED, i, case_.expected_ret, actual_ret, TEXT_RESET);
-            cnt++;
-            continue;
-        }
-
-        if (actual_ret != WBY_OK)
+        wanbeiyu_error_t actual_ret = wanbeiyu_button_init(case_.btn, (wanbeiyu_gpio_t *)case_.gpio);
+        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
+        if (actual_ret != WANBEIYU_OK)
         {
             continue;
         }
@@ -64,17 +56,18 @@ int test_button_init(void)
 
 int test_button_hold(void)
 {
+    printf("  * %s\n", __func__);
     int cnt = 0;
 
-    wby_button_t *btn_null = NULL;
-    wby_button_hold(btn_null); /* Expected that nothing will happen. */
+    wanbeiyu_button_t *btn_null = NULL;
+    wanbeiyu_button_hold(btn_null); /* Expected that nothing will happen. */
 
     test_gpio_t gpio;
     test_gpio_init(&gpio);
-    wby_button_t btn;
-    assert(wby_button_init(&btn, (wby_gpio_t *)&gpio) == WBY_OK);
+    wanbeiyu_button_t btn;
+    assert(wanbeiyu_button_init(&btn, (wanbeiyu_gpio_t *)&gpio) == WANBEIYU_OK);
 
-    wby_button_hold(&btn);
+    wanbeiyu_button_hold(&btn);
 
     test_gpio_state_t actual_state = gpio.state;
 
@@ -89,17 +82,18 @@ int test_button_hold(void)
 
 int test_button_release(void)
 {
+    printf("  * %s\n", __func__);
     int cnt = 0;
 
-    wby_button_t *btn_null = NULL;
-    wby_button_release(btn_null); /* Expected that nothing will happen. */
+    wanbeiyu_button_t *btn_null = NULL;
+    wanbeiyu_button_release(btn_null); /* Expected that nothing will happen. */
 
     test_gpio_t gpio;
     test_gpio_init(&gpio);
-    wby_button_t btn;
-    assert(wby_button_init(&btn, (wby_gpio_t *)&gpio) == WBY_OK);
+    wanbeiyu_button_t btn;
+    assert(wanbeiyu_button_init(&btn, (wanbeiyu_gpio_t *)&gpio) == WANBEIYU_OK);
 
-    wby_button_release(&btn);
+    wanbeiyu_button_release(&btn);
 
     test_gpio_state_t actual_state = gpio.state;
 
@@ -114,14 +108,11 @@ int test_button_release(void)
 
 int test_button(void)
 {
-    printf("* test_button\n");
+    printf("* %s\n", __func__);
     int cnt = 0;
 
-    printf("  * test_button_init\n");
     cnt += test_button_init();
-    printf("  * test_button_hold\n");
     cnt += test_button_hold();
-    printf("  * test_button_release\n");
     cnt += test_button_release();
 
     return cnt;

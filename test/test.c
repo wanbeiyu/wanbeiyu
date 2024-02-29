@@ -1,4 +1,4 @@
-#include "wanbeiyu.h"
+#include <wanbeiyu.h>
 #include "test.h"
 
 #include <stdio.h>

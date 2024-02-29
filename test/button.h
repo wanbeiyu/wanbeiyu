@@ -1,7 +1,7 @@
 #ifndef TEST_BUTTON_H_
 #define TEST_BUTTON_H_
 
-#include "wanbeiyu.h"
+#include <wanbeiyu.h>
 #include "test.h"
 
 #include <assert.h>

@@ -1,7 +1,7 @@
 #ifndef TEST_H_
 #define TEST_H_
 
-#include "wanbeiyu.h"
+#include <wanbeiyu.h>
 
 #define TEXT_RED "\e[31m"
 #define TEXT_GREEN "\e[32m"

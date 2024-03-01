@@ -10,9 +10,9 @@ extern "C"
 
     typedef int WanbeiyuErrNo;
 
-#define WANBEIYU_OK ((WanbeiyuErrNo)0)
-#define WANBEIYU_EIO ((WanbeiyuErrNo)5)
-#define WANBEIYU_EINVAL ((WanbeiyuErrNo)22)
+#define WANBEIYU_OK /*    */ ((WanbeiyuErrNo)0)
+#define WANBEIYU_EIO /*   */ ((WanbeiyuErrNo)5)
+#define WANBEIYU_EINVAL /**/ ((WanbeiyuErrNo)22)
 
     typedef struct WanbeiyuGPIO
     {
@@ -44,10 +44,10 @@ extern "C"
 #define WANBEIYU_HAT_DOWN /*    0b0010 */ ((WanbeiyuHatDirection)2)
 #define WANBEIYU_HAT_RIGHT /*   0b0100 */ ((WanbeiyuHatDirection)4)
 #define WANBEIYU_HAT_UP /*      0b1000 */ ((WanbeiyuHatDirection)8)
-#define WANBEIYU_HAT_UPRIGHT ((WanbeiyuHatDirection)(WANBEIYU_HAT_UP | WANBEIYU_HAT_RIGHT))
-#define WANBEIYU_HAT_DOWNRIGHT ((WanbeiyuHatDirection)(WANBEIYU_HAT_DOWN | WANBEIYU_HAT_RIGHT))
-#define WANBEIYU_HAT_DOWNLEFT ((WanbeiyuHatDirection)(WANBEIYU_HAT_DOWN | WANBEIYU_HAT_LEFT))
-#define WANBEIYU_HAT_UPLEFT ((WanbeiyuHatDirection)(WANBEIYU_HAT_UP | WANBEIYU_HAT_LEFT))
+#define WANBEIYU_HAT_UPRIGHT /*        */ ((WanbeiyuHatDirection)(WANBEIYU_HAT_UP | WANBEIYU_HAT_RIGHT))
+#define WANBEIYU_HAT_DOWNRIGHT /*      */ ((WanbeiyuHatDirection)(WANBEIYU_HAT_DOWN | WANBEIYU_HAT_RIGHT))
+#define WANBEIYU_HAT_DOWNLEFT /*       */ ((WanbeiyuHatDirection)(WANBEIYU_HAT_DOWN | WANBEIYU_HAT_LEFT))
+#define WANBEIYU_HAT_UPLEFT /*         */ ((WanbeiyuHatDirection)(WANBEIYU_HAT_UP | WANBEIYU_HAT_LEFT))
 
     WanbeiyuErrNo wanbeiyu_hat_init(WanbeiyuHat *hat, WanbeiyuGPIO *up, WanbeiyuGPIO *right, WanbeiyuGPIO *down, WanbeiyuGPIO *left);
     WanbeiyuErrNo wanbeiyu_hat_hold(WanbeiyuHat *hat, WanbeiyuHatDirection dir);

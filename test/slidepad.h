@@ -60,9 +60,9 @@ int test_slidepad_hold(void)
         uint8_t expected_vertical_value;
     } TestCase;
 
-    TestCase cases[] = {{.x = WANBEIYU_SLIDEPAD_NEUTRAL, .y = WANBEIYU_SLIDEPAD_NEUTRAL, .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SOURCE, /**/ .expected_horizontal_value = 0, /*   */ .expected_vertical_state = TEST_IDAC_SOURCE, /**/ .expected_vertical_value = 0},
-                        {.x = 0, /*                   */ .y = 0, /*                   */ .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SOURCE, /**/ .expected_horizontal_value = UINT8_MAX, .expected_vertical_state = TEST_IDAC_SOURCE, /**/ .expected_vertical_value = UINT8_MAX},
-                        {.x = UINT8_MAX, /*           */ .y = UINT8_MAX, /*           */ .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SINK, /*  */ .expected_horizontal_value = UINT8_MAX, .expected_vertical_state = TEST_IDAC_SINK, /*  */ .expected_vertical_value = UINT8_MAX}};
+    TestCase cases[] = {{.x = WANBEIYU_SLIDEPAD_AXIS_NEUTRAL, .y = WANBEIYU_SLIDEPAD_AXIS_NEUTRAL, .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SOURCE, /**/ .expected_horizontal_value = 0, /*   */ .expected_vertical_state = TEST_IDAC_SOURCE, /**/ .expected_vertical_value = 0},
+                        {.x = 0, /*                        */ .y = 0, /*                        */ .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SOURCE, /**/ .expected_horizontal_value = UINT8_MAX, .expected_vertical_state = TEST_IDAC_SOURCE, /**/ .expected_vertical_value = UINT8_MAX},
+                        {.x = UINT8_MAX, /*                */ .y = UINT8_MAX, /*                */ .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SINK, /*  */ .expected_horizontal_value = UINT8_MAX, .expected_vertical_state = TEST_IDAC_SINK, /*  */ .expected_vertical_value = UINT8_MAX}};
 
     TEST_FOR(cases)
     {

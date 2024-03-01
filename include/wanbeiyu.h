@@ -65,7 +65,7 @@ extern "C"
         WanbeiyuIDAC *vertical;
     } WanbeiyuSlidepad;
 
-#define WANBEIYU_SLIDEPAD_NEUTRAL ((uint8_t)128)
+#define WANBEIYU_SLIDEPAD_AXIS_NEUTRAL ((uint8_t)128)
 
     WanbeiyuErrNo wanbeiyu_slidepad_init(WanbeiyuSlidepad *sp, WanbeiyuIDAC *horizontal, WanbeiyuIDAC *vertical);
     WanbeiyuErrNo wanbeiyu_slidepad_hold(WanbeiyuSlidepad *sp, uint8_t x, uint8_t y);

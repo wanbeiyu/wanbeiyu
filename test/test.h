@@ -8,8 +8,8 @@
 #define TEXT_RESET "\e[0m"
 
 #define TEST_FOR(cases) \
-    test_case_t case_;  \
-    for (size_t i = 0; case_ = (cases)[i], i < sizeof((cases)) / sizeof(test_case_t); i++)
+    TestCase case_;     \
+    for (size_t i = 0; case_ = (cases)[i], i < sizeof((cases)) / sizeof(TestCase); i++)
 
 #define TEST_VAR_NAME(var) #var
 
@@ -29,123 +29,123 @@
 #define TEST_UINT16_MID ((uint16_t)0x8000)
 #define TEST_RDAC_TOLERANCE ((double)500.0)
 
-typedef enum test_gpio_state_t
+typedef enum TestGPIOState
 {
     TEST_GPIO_LOW,
     TEST_GPIO_HI_Z,
-} test_gpio_state_t;
+} TestGPIOState;
 
 #define TEST_GPIO_STATE(s) ((s) == TEST_GPIO_LOW    ? TEST_VAR_NAME(TEST_GPIO_LOW)  \
                             : (s) == TEST_GPIO_HI_Z ? TEST_VAR_NAME(TEST_GPIO_HI_Z) \
                                                     : "")
 
-typedef struct test_gpio_t
+typedef struct TestGPIO
 {
-    wanbeiyu_gpio_t parent;
-    test_gpio_state_t state;
-} test_gpio_t;
+    WanbeiyuGPIO parent;
+    TestGPIOState state;
+} TestGPIO;
 
-wanbeiyu_error_t test_gpio_set_low(wanbeiyu_gpio_t *gpio)
+WanbeiyuError test_gpio_set_low(WanbeiyuGPIO *gpio)
 {
-    ((test_gpio_t *)gpio)->state = TEST_GPIO_LOW;
+    ((TestGPIO *)gpio)->state = TEST_GPIO_LOW;
     return WANBEIYU_OK;
 }
 
-wanbeiyu_error_t test_gpio_set_hi_z(wanbeiyu_gpio_t *gpio)
+WanbeiyuError test_gpio_set_hi_z(WanbeiyuGPIO *gpio)
 {
-    ((test_gpio_t *)gpio)->state = TEST_GPIO_HI_Z;
+    ((TestGPIO *)gpio)->state = TEST_GPIO_HI_Z;
     return WANBEIYU_OK;
 }
 
-void test_gpio_init(test_gpio_t *gpio)
+void test_gpio_init(TestGPIO *gpio)
 {
     gpio->parent.set_low = test_gpio_set_low;
     gpio->parent.set_hi_z = test_gpio_set_hi_z;
 }
 
-typedef enum test_idac_state_t
+typedef enum TestIDACState
 {
     TEST_IDAC_SINK,
     TEST_IDAC_SOURCE
-} test_idac_state_t;
+} TestIDACState;
 
 #define TEST_IDAC_STATE(s) ((s) == TEST_IDAC_SINK     ? TEST_VAR_NAME(TEST_IDAC_SINK)   \
                             : (s) == TEST_IDAC_SOURCE ? TEST_VAR_NAME(TEST_IDAC_SOURCE) \
                                                       : "")
 
-typedef struct test_idac_t
+typedef struct TestIDAC
 {
-    wanbeiyu_idac_t parent;
-    test_idac_state_t state;
+    WanbeiyuIDAC parent;
+    TestIDACState state;
     uint8_t value;
-} test_idac_t;
+} TestIDAC;
 
-wanbeiyu_error_t test_idac_set_sink(wanbeiyu_idac_t *idac, uint8_t val)
+WanbeiyuError test_idac_set_sink(WanbeiyuIDAC *idac, uint8_t val)
 {
-    ((test_idac_t *)idac)->state = TEST_IDAC_SINK;
-    ((test_idac_t *)idac)->value = val;
+    ((TestIDAC *)idac)->state = TEST_IDAC_SINK;
+    ((TestIDAC *)idac)->value = val;
     return WANBEIYU_OK;
 }
 
-wanbeiyu_error_t test_idac_set_source(wanbeiyu_idac_t *idac, uint8_t val)
+WanbeiyuError test_idac_set_source(WanbeiyuIDAC *idac, uint8_t val)
 {
-    ((test_idac_t *)idac)->state = TEST_IDAC_SOURCE;
-    ((test_idac_t *)idac)->value = val;
+    ((TestIDAC *)idac)->state = TEST_IDAC_SOURCE;
+    ((TestIDAC *)idac)->value = val;
     return WANBEIYU_OK;
 }
 
-void test_idac_init(test_idac_t *idac)
+void test_idac_init(TestIDAC *idac)
 {
     idac->parent.set_sink = test_idac_set_sink;
     idac->parent.set_source = test_idac_set_source;
 }
-typedef struct test_rdac_t
+typedef struct TestRDAC
 {
-    wanbeiyu_rdac_t parent;
+    WanbeiyuRDAC parent;
     uint16_t position;
-} test_rdac_t;
+} TestRDAC;
 
-wanbeiyu_error_t test_digipot_set_wiper_position(wanbeiyu_rdac_t *rdac, uint16_t pos)
+WanbeiyuError test_digipot_set_wiper_position(WanbeiyuRDAC *rdac, uint16_t pos)
 {
-    ((test_rdac_t *)rdac)->position = pos;
+    ((TestRDAC *)rdac)->position = pos;
     return WANBEIYU_OK;
 }
 
-test_rdac_t *test_rdac_init(test_rdac_t *rdac)
+TestRDAC *test_rdac_init(TestRDAC *rdac)
 {
     rdac->parent.set_wiper_position = test_digipot_set_wiper_position;
     rdac->position = 0;
 }
 
-typedef enum test_switch_state_t
+typedef enum TestSwitchState
 {
     TEST_SWITCH_ON,
     TEST_SWITCH_OFF
-} test_switch_state_t;
+} TestSwitchState;
 
 #define TEST_SWITCH_STATE(s) ((s) == TEST_SWITCH_ON    ? TEST_VAR_NAME(TEST_SWITCH_ON)  \
                               : (s) == TEST_SWITCH_OFF ? TEST_VAR_NAME(TEST_SWITCH_OFF) \
                                                        : "")
 
-typedef struct test_switch_t
+typedef struct TestSwitch
 {
-    wanbeiyu_spst_switch_t parent;
-    test_switch_state_t state;
-} test_switch_t;
+    WanbeiyuSPSTSwitch parent;
+    TestSwitchState state;
+} TestSwitch;
 
-wanbeiyu_error_t test_switch_on(wanbeiyu_spst_switch_t *sw)
+WanbeiyuError test_switch_on(WanbeiyuSPSTSwitch *sw)
 {
-    ((test_switch_t *)sw)->state = TEST_SWITCH_ON;
+    ((TestSwitch *)sw)->state = TEST_SWITCH_ON;
     return WANBEIYU_OK;
 }
 
-wanbeiyu_error_t test_switch_off(wanbeiyu_spst_switch_t *sw)
+WanbeiyuError test_switch_off(WanbeiyuSPSTSwitch *sw)
 {
-    ((test_switch_t *)sw)->state = TEST_SWITCH_OFF;
+    ((TestSwitch *)sw)->state = TEST_SWITCH_OFF;
     return WANBEIYU_OK;
 }
 
-void test_switch_init(test_switch_t *sw)
+void test_switch_init(TestSwitch *sw)
 {
     sw->parent.on = test_switch_on;
     sw->parent.off = test_switch_off;

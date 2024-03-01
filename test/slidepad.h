@@ -12,31 +12,31 @@ int test_slidepad_init(void)
     printf("  * %s\n", __func__);
     int cnt = 0;
 
-    typedef struct test_case_t
+    typedef struct TestCase
     {
-        wanbeiyu_slidepad_t *sp;
-        wanbeiyu_idac_t *h;
-        wanbeiyu_idac_t *v;
+        WanbeiyuSlidepad *sp;
+        WanbeiyuIDAC *h;
+        WanbeiyuIDAC *v;
 
-        wanbeiyu_error_t expected_ret;
-    } test_case_t;
+        WanbeiyuError expected_ret;
+    } TestCase;
 
-    wanbeiyu_slidepad_t sp[8];
-    wanbeiyu_idac_t h[8];
-    wanbeiyu_idac_t v[8];
+    WanbeiyuSlidepad sp[8];
+    WanbeiyuIDAC h[8];
+    WanbeiyuIDAC v[8];
 
-    test_case_t cases[] = {{.sp = NULL, /*  */ .h = NULL, /* */ .v = NULL, /* */ .expected_ret = WANBEIYU_EINVAL},
-                           {.sp = &sp[1], /**/ .h = NULL, /* */ .v = NULL, /* */ .expected_ret = WANBEIYU_EINVAL},
-                           {.sp = NULL, /*  */ .h = &h[2], /**/ .v = NULL, /* */ .expected_ret = WANBEIYU_EINVAL},
-                           {.sp = &sp[3], /**/ .h = &h[3], /**/ .v = NULL, /* */ .expected_ret = WANBEIYU_EINVAL},
-                           {.sp = NULL, /*  */ .h = NULL, /* */ .v = &v[4], /**/ .expected_ret = WANBEIYU_EINVAL},
-                           {.sp = &sp[5], /**/ .h = NULL, /* */ .v = &v[5], /**/ .expected_ret = WANBEIYU_EINVAL},
-                           {.sp = NULL, /*  */ .h = &h[6], /**/ .v = &v[6], /**/ .expected_ret = WANBEIYU_EINVAL},
-                           {.sp = &sp[7], /**/ .h = &h[7], /**/ .v = &v[7], /**/ .expected_ret = WANBEIYU_OK}};
+    TestCase cases[] = {{.sp = NULL, /*  */ .h = NULL, /* */ .v = NULL, /* */ .expected_ret = WANBEIYU_EINVAL},
+                        {.sp = &sp[1], /**/ .h = NULL, /* */ .v = NULL, /* */ .expected_ret = WANBEIYU_EINVAL},
+                        {.sp = NULL, /*  */ .h = &h[2], /**/ .v = NULL, /* */ .expected_ret = WANBEIYU_EINVAL},
+                        {.sp = &sp[3], /**/ .h = &h[3], /**/ .v = NULL, /* */ .expected_ret = WANBEIYU_EINVAL},
+                        {.sp = NULL, /*  */ .h = NULL, /* */ .v = &v[4], /**/ .expected_ret = WANBEIYU_EINVAL},
+                        {.sp = &sp[5], /**/ .h = NULL, /* */ .v = &v[5], /**/ .expected_ret = WANBEIYU_EINVAL},
+                        {.sp = NULL, /*  */ .h = &h[6], /**/ .v = &v[6], /**/ .expected_ret = WANBEIYU_EINVAL},
+                        {.sp = &sp[7], /**/ .h = &h[7], /**/ .v = &v[7], /**/ .expected_ret = WANBEIYU_OK}};
 
     TEST_FOR(cases)
     {
-        wanbeiyu_error_t actual_ret = wanbeiyu_slidepad_init(case_.sp, (wanbeiyu_idac_t *)case_.h, (wanbeiyu_idac_t *)case_.v);
+        WanbeiyuError actual_ret = wanbeiyu_slidepad_init(case_.sp, (WanbeiyuIDAC *)case_.h, (WanbeiyuIDAC *)case_.v);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
     }
 
@@ -48,34 +48,34 @@ int test_slidepad_hold(void)
     printf("  * %s\n", __func__);
     int cnt = 0;
 
-    typedef struct test_case_t
+    typedef struct TestCase
     {
         uint8_t x;
         uint8_t y;
 
-        wanbeiyu_error_t expected_ret;
-        test_idac_state_t expected_h_state;
+        WanbeiyuError expected_ret;
+        TestIDACState expected_h_state;
         uint8_t expected_h_value;
-        test_idac_state_t expected_v_state;
+        TestIDACState expected_v_state;
         uint8_t expected_v_value;
-    } test_case_t;
+    } TestCase;
 
-    test_case_t cases[] = {{.x = WANBEIYU_SLIDEPAD_NEUTRAL, .y = WANBEIYU_SLIDEPAD_NEUTRAL, .expected_ret = WANBEIYU_OK, .expected_h_state = TEST_IDAC_SOURCE, /**/ .expected_h_value = 0, /*   */ .expected_v_state = TEST_IDAC_SOURCE, /**/ .expected_v_value = 0},
-                           {.x = 0, /*                   */ .y = 0, /*                   */ .expected_ret = WANBEIYU_OK, .expected_h_state = TEST_IDAC_SOURCE, /**/ .expected_h_value = UINT8_MAX, .expected_v_state = TEST_IDAC_SOURCE, /**/ .expected_v_value = UINT8_MAX},
-                           {.x = UINT8_MAX, /*           */ .y = UINT8_MAX, /*           */ .expected_ret = WANBEIYU_OK, .expected_h_state = TEST_IDAC_SINK, /*  */ .expected_h_value = UINT8_MAX, .expected_v_state = TEST_IDAC_SINK, /*  */ .expected_v_value = UINT8_MAX}};
+    TestCase cases[] = {{.x = WANBEIYU_SLIDEPAD_NEUTRAL, .y = WANBEIYU_SLIDEPAD_NEUTRAL, .expected_ret = WANBEIYU_OK, .expected_h_state = TEST_IDAC_SOURCE, /**/ .expected_h_value = 0, /*   */ .expected_v_state = TEST_IDAC_SOURCE, /**/ .expected_v_value = 0},
+                        {.x = 0, /*                   */ .y = 0, /*                   */ .expected_ret = WANBEIYU_OK, .expected_h_state = TEST_IDAC_SOURCE, /**/ .expected_h_value = UINT8_MAX, .expected_v_state = TEST_IDAC_SOURCE, /**/ .expected_v_value = UINT8_MAX},
+                        {.x = UINT8_MAX, /*           */ .y = UINT8_MAX, /*           */ .expected_ret = WANBEIYU_OK, .expected_h_state = TEST_IDAC_SINK, /*  */ .expected_h_value = UINT8_MAX, .expected_v_state = TEST_IDAC_SINK, /*  */ .expected_v_value = UINT8_MAX}};
 
     TEST_FOR(cases)
     {
-        wanbeiyu_slidepad_t *sp_null = NULL;
-        wanbeiyu_error_t actual_ret = wanbeiyu_slidepad_hold(sp_null, case_.x, case_.y);
+        WanbeiyuSlidepad *sp_null = NULL;
+        WanbeiyuError actual_ret = wanbeiyu_slidepad_hold(sp_null, case_.x, case_.y);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
 
-        wanbeiyu_slidepad_t sp;
-        test_idac_t h;
-        test_idac_t v;
+        WanbeiyuSlidepad sp;
+        TestIDAC h;
+        TestIDAC v;
         test_idac_init(&h);
         test_idac_init(&v);
-        assert(wanbeiyu_slidepad_init(&sp, (wanbeiyu_idac_t *)&h, (wanbeiyu_idac_t *)&v) == WANBEIYU_OK);
+        assert(wanbeiyu_slidepad_init(&sp, (WanbeiyuIDAC *)&h, (WanbeiyuIDAC *)&v) == WANBEIYU_OK);
 
         actual_ret = wanbeiyu_slidepad_hold(&sp, case_.x, case_.y);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
@@ -84,9 +84,9 @@ int test_slidepad_hold(void)
             continue;
         }
 
-        test_idac_state_t actual_h_state = h.state;
+        TestIDACState actual_h_state = h.state;
         uint8_t actual_h_value = h.value;
-        test_idac_state_t actual_v_state = v.state;
+        TestIDACState actual_v_state = v.state;
         uint8_t actual_v_value = v.value;
         if (actual_h_state != case_.expected_h_state ||
             actual_h_value != case_.expected_h_value ||
@@ -116,29 +116,29 @@ int test_slidepad_release(void)
     printf("  * %s\n", __func__);
     int cnt = 0;
 
-    typedef struct test_case_t
+    typedef struct TestCase
     {
-        wanbeiyu_error_t expected_ret;
-        test_idac_state_t expected_h_state;
+        WanbeiyuError expected_ret;
+        TestIDACState expected_h_state;
         uint8_t expected_h_value;
-        test_idac_state_t expected_v_state;
+        TestIDACState expected_v_state;
         uint8_t expected_v_value;
-    } test_case_t;
+    } TestCase;
 
-    test_case_t cases[] = {{.expected_ret = WANBEIYU_OK, .expected_h_state = TEST_IDAC_SOURCE, .expected_h_value = 0, .expected_v_state = TEST_IDAC_SOURCE, .expected_v_value = 0}};
+    TestCase cases[] = {{.expected_ret = WANBEIYU_OK, .expected_h_state = TEST_IDAC_SOURCE, .expected_h_value = 0, .expected_v_state = TEST_IDAC_SOURCE, .expected_v_value = 0}};
 
     TEST_FOR(cases)
     {
-        wanbeiyu_slidepad_t *sp_null = NULL;
-        wanbeiyu_error_t actual_ret = wanbeiyu_slidepad_release(sp_null);
+        WanbeiyuSlidepad *sp_null = NULL;
+        WanbeiyuError actual_ret = wanbeiyu_slidepad_release(sp_null);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
 
-        wanbeiyu_slidepad_t sp;
-        test_idac_t h;
-        test_idac_t v;
+        WanbeiyuSlidepad sp;
+        TestIDAC h;
+        TestIDAC v;
         test_idac_init(&h);
         test_idac_init(&v);
-        assert(wanbeiyu_slidepad_init(&sp, (wanbeiyu_idac_t *)&h, (wanbeiyu_idac_t *)&v) == WANBEIYU_OK);
+        assert(wanbeiyu_slidepad_init(&sp, (WanbeiyuIDAC *)&h, (WanbeiyuIDAC *)&v) == WANBEIYU_OK);
 
         actual_ret = wanbeiyu_slidepad_release(&sp);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
@@ -147,9 +147,9 @@ int test_slidepad_release(void)
             continue;
         }
 
-        test_idac_state_t actual_h_state = h.state;
+        TestIDACState actual_h_state = h.state;
         uint8_t actual_h_value = h.value;
-        test_idac_state_t actual_v_state = v.state;
+        TestIDACState actual_v_state = v.state;
         uint8_t actual_v_value = v.value;
         if (actual_h_state != case_.expected_h_state ||
             actual_h_value != case_.expected_h_value ||

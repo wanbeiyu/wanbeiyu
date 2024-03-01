@@ -8,93 +8,93 @@ extern "C"
 
 #include <stdint.h>
 
-    typedef int wanbeiyu_error_t;
+    typedef int WanbeiyuError;
 
-#define WANBEIYU_OK ((wanbeiyu_error_t)0)
-#define WANBEIYU_EIO ((wanbeiyu_error_t)5)
-#define WANBEIYU_EINVAL ((wanbeiyu_error_t)22)
+#define WANBEIYU_OK ((WanbeiyuError)0)
+#define WANBEIYU_EIO ((WanbeiyuError)5)
+#define WANBEIYU_EINVAL ((WanbeiyuError)22)
 
-    typedef struct wanbeiyu_gpio_t
+    typedef struct WanbeiyuGPIO
     {
-        wanbeiyu_error_t (*set_low)(struct wanbeiyu_gpio_t *gpio);
-        wanbeiyu_error_t (*set_hi_z)(struct wanbeiyu_gpio_t *gpio);
-    } wanbeiyu_gpio_t;
+        WanbeiyuError (*set_low)(struct WanbeiyuGPIO *gpio);
+        WanbeiyuError (*set_hi_z)(struct WanbeiyuGPIO *gpio);
+    } WanbeiyuGPIO;
 
-    typedef struct wanbeiyu_button_t
+    typedef struct WanbeiyuButton
     {
-        wanbeiyu_gpio_t *gpio_;
-    } wanbeiyu_button_t;
+        WanbeiyuGPIO *gpio_;
+    } WanbeiyuButton;
 
-    wanbeiyu_error_t wanbeiyu_button_init(wanbeiyu_button_t *btn, wanbeiyu_gpio_t *gpio);
-    wanbeiyu_error_t wanbeiyu_button_hold(wanbeiyu_button_t *btn);
-    wanbeiyu_error_t wanbeiyu_button_release(wanbeiyu_button_t *btn);
+    WanbeiyuError wanbeiyu_button_init(WanbeiyuButton *btn, WanbeiyuGPIO *gpio);
+    WanbeiyuError wanbeiyu_button_hold(WanbeiyuButton *btn);
+    WanbeiyuError wanbeiyu_button_release(WanbeiyuButton *btn);
 
-    typedef struct wanbeiyu_hat_t
+    typedef struct WanbeiyuHat
     {
-        wanbeiyu_gpio_t *up_;
-        wanbeiyu_gpio_t *right_;
-        wanbeiyu_gpio_t *down_;
-        wanbeiyu_gpio_t *left_;
-    } wanbeiyu_hat_t;
+        WanbeiyuGPIO *up_;
+        WanbeiyuGPIO *right_;
+        WanbeiyuGPIO *down_;
+        WanbeiyuGPIO *left_;
+    } WanbeiyuHat;
 
-    typedef uint8_t wanbeiyu_hat_direction_t;
+    typedef uint8_t WanbeiyuHatDirection;
 
-#define WANBEIYU_HAT_UP ((wanbeiyu_hat_direction_t)8)    /* 0b1000 */
-#define WANBEIYU_HAT_RIGHT ((wanbeiyu_hat_direction_t)4) /* 0b0100 */
-#define WANBEIYU_HAT_DOWN ((wanbeiyu_hat_direction_t)2)  /* 0b0010 */
-#define WANBEIYU_HAT_LEFT ((wanbeiyu_hat_direction_t)1)  /* 0b0001 */
-#define WANBEIYU_HAT_UPRIGHT ((wanbeiyu_hat_direction_t)(WANBEIYU_HAT_UP | WANBEIYU_HAT_RIGHT))
-#define WANBEIYU_HAT_DOWNRIGHT ((wanbeiyu_hat_direction_t)(WANBEIYU_HAT_DOWN | WANBEIYU_HAT_RIGHT))
-#define WANBEIYU_HAT_DOWNLEFT ((wanbeiyu_hat_direction_t)(WANBEIYU_HAT_DOWN | WANBEIYU_HAT_LEFT))
-#define WANBEIYU_HAT_UPLEFT ((wanbeiyu_hat_direction_t)(WANBEIYU_HAT_UP | WANBEIYU_HAT_LEFT))
-#define WANBEIYU_HAT_NEUTRAL ((wanbeiyu_hat_direction_t)0) /* 0b0000 */
+#define WANBEIYU_HAT_UP ((WanbeiyuHatDirection)8)    /* 0b1000 */
+#define WANBEIYU_HAT_RIGHT ((WanbeiyuHatDirection)4) /* 0b0100 */
+#define WANBEIYU_HAT_DOWN ((WanbeiyuHatDirection)2)  /* 0b0010 */
+#define WANBEIYU_HAT_LEFT ((WanbeiyuHatDirection)1)  /* 0b0001 */
+#define WANBEIYU_HAT_UPRIGHT ((WanbeiyuHatDirection)(WANBEIYU_HAT_UP | WANBEIYU_HAT_RIGHT))
+#define WANBEIYU_HAT_DOWNRIGHT ((WanbeiyuHatDirection)(WANBEIYU_HAT_DOWN | WANBEIYU_HAT_RIGHT))
+#define WANBEIYU_HAT_DOWNLEFT ((WanbeiyuHatDirection)(WANBEIYU_HAT_DOWN | WANBEIYU_HAT_LEFT))
+#define WANBEIYU_HAT_UPLEFT ((WanbeiyuHatDirection)(WANBEIYU_HAT_UP | WANBEIYU_HAT_LEFT))
+#define WANBEIYU_HAT_NEUTRAL ((WanbeiyuHatDirection)0) /* 0b0000 */
 
-    wanbeiyu_error_t wanbeiyu_hat_init(wanbeiyu_hat_t *hat, wanbeiyu_gpio_t *up, wanbeiyu_gpio_t *right, wanbeiyu_gpio_t *down, wanbeiyu_gpio_t *left);
-    wanbeiyu_error_t wanbeiyu_hat_hold(wanbeiyu_hat_t *hat, wanbeiyu_hat_direction_t dir);
-    wanbeiyu_error_t wanbeiyu_hat_release(wanbeiyu_hat_t *hat);
+    WanbeiyuError wanbeiyu_hat_init(WanbeiyuHat *hat, WanbeiyuGPIO *up, WanbeiyuGPIO *right, WanbeiyuGPIO *down, WanbeiyuGPIO *left);
+    WanbeiyuError wanbeiyu_hat_hold(WanbeiyuHat *hat, WanbeiyuHatDirection dir);
+    WanbeiyuError wanbeiyu_hat_release(WanbeiyuHat *hat);
 
-    typedef struct wanbeiyu_idac_t
+    typedef struct WanbeiyuIDAC
     {
-        wanbeiyu_error_t (*set_sink)(struct wanbeiyu_idac_t *idac, uint8_t val);
-        wanbeiyu_error_t (*set_source)(struct wanbeiyu_idac_t *idac, uint8_t val);
-    } wanbeiyu_idac_t;
+        WanbeiyuError (*set_sink)(struct WanbeiyuIDAC *idac, uint8_t val);
+        WanbeiyuError (*set_source)(struct WanbeiyuIDAC *idac, uint8_t val);
+    } WanbeiyuIDAC;
 
-    typedef struct wanbeiyu_slidepad_t
+    typedef struct WanbeiyuSlidepad
     {
-        wanbeiyu_idac_t *h_;
-        wanbeiyu_idac_t *v_;
-    } wanbeiyu_slidepad_t;
+        WanbeiyuIDAC *h_;
+        WanbeiyuIDAC *v_;
+    } WanbeiyuSlidepad;
 
 #define WANBEIYU_SLIDEPAD_NEUTRAL ((uint8_t)128)
 
-    wanbeiyu_error_t wanbeiyu_slidepad_init(wanbeiyu_slidepad_t *sp, wanbeiyu_idac_t *h, wanbeiyu_idac_t *v);
-    wanbeiyu_error_t wanbeiyu_slidepad_hold(wanbeiyu_slidepad_t *sp, uint8_t x, uint8_t y);
-    wanbeiyu_error_t wanbeiyu_slidepad_release(wanbeiyu_slidepad_t *sp);
+    WanbeiyuError wanbeiyu_slidepad_init(WanbeiyuSlidepad *sp, WanbeiyuIDAC *h, WanbeiyuIDAC *v);
+    WanbeiyuError wanbeiyu_slidepad_hold(WanbeiyuSlidepad *sp, uint8_t x, uint8_t y);
+    WanbeiyuError wanbeiyu_slidepad_release(WanbeiyuSlidepad *sp);
 
-    typedef struct wanbeiyu_rdac_t
+    typedef struct WanbeiyuRDAC
     {
-        wanbeiyu_error_t (*set_wiper_position)(struct wanbeiyu_rdac_t *rdac, uint16_t pos);
-    } wanbeiyu_rdac_t;
+        WanbeiyuError (*set_wiper_position)(struct WanbeiyuRDAC *rdac, uint16_t pos);
+    } WanbeiyuRDAC;
 
-    typedef struct wanbeiyu_spst_switch_t
+    typedef struct WanbeiyuSPSTSwitch
     {
-        wanbeiyu_error_t (*on)(struct wanbeiyu_spst_switch_t *sw);
-        wanbeiyu_error_t (*off)(struct wanbeiyu_spst_switch_t *sw);
-    } wanbeiyu_spst_switch_t;
+        WanbeiyuError (*on)(struct WanbeiyuSPSTSwitch *sw);
+        WanbeiyuError (*off)(struct WanbeiyuSPSTSwitch *sw);
+    } WanbeiyuSPSTSwitch;
 
-    typedef struct wanbeiyu_touchscreen_t
+    typedef struct WanbeiyuTouchscreen
     {
-        wanbeiyu_rdac_t *h_;
-        wanbeiyu_rdac_t *v_;
-        wanbeiyu_spst_switch_t *sw_;
-    } wanbeiyu_touchscreen_t;
+        WanbeiyuRDAC *h_;
+        WanbeiyuRDAC *v_;
+        WanbeiyuSPSTSwitch *sw_;
+    } WanbeiyuTouchscreen;
 
 #define WANBEIYU_TOUCHSCREEN_X_MAX ((uint16_t)319)
 #define WANBEIYU_TOUCHSCREEN_Y_MAX ((uint8_t)239)
 
-    wanbeiyu_error_t wanbeiyu_touchscreen_init(wanbeiyu_touchscreen_t *ts, wanbeiyu_rdac_t *h, wanbeiyu_rdac_t *v, wanbeiyu_spst_switch_t *sw);
-    wanbeiyu_error_t wanbeiyu_touchscreen_hold(wanbeiyu_touchscreen_t *ts, uint16_t x, uint8_t y);
-    wanbeiyu_error_t wanbeiyu_touchscreen_release(wanbeiyu_touchscreen_t *ts);
+    WanbeiyuError wanbeiyu_touchscreen_init(WanbeiyuTouchscreen *ts, WanbeiyuRDAC *h, WanbeiyuRDAC *v, WanbeiyuSPSTSwitch *sw);
+    WanbeiyuError wanbeiyu_touchscreen_hold(WanbeiyuTouchscreen *ts, uint16_t x, uint8_t y);
+    WanbeiyuError wanbeiyu_touchscreen_release(WanbeiyuTouchscreen *ts);
 
 #ifdef __cplusplus
 }

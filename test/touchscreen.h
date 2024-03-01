@@ -15,23 +15,17 @@ int test_touchscreen_init(void)
     typedef struct test_case_t
     {
         wanbeiyu_touchscreen_t *ts;
-        test_rdac_t *h;
-        test_rdac_t *v;
-        test_switch_t *sw;
+        wanbeiyu_rdac_t *h;
+        wanbeiyu_rdac_t *v;
+        wanbeiyu_spst_switch_t *sw;
 
         wanbeiyu_error_t expected_ret;
     } test_case_t;
 
     wanbeiyu_touchscreen_t ts[16];
-    test_rdac_t h[16];
-    test_rdac_t v[16];
-    test_switch_t sw[16];
-    for (size_t i = 0; i < 16; i++)
-    {
-        test_rdac_init(&h[i]);
-        test_rdac_init(&v[i]);
-        test_switch_init(&sw[i]);
-    }
+    wanbeiyu_rdac_t h[16];
+    wanbeiyu_rdac_t v[16];
+    wanbeiyu_spst_switch_t sw[16];
 
     test_case_t cases[] = {{.ts = NULL, /*   */ .h = NULL, /*  */ .v = NULL, /*  */ .sw = NULL, /*   */ .expected_ret = WANBEIYU_EINVAL},
                            {.ts = &ts[1], /* */ .h = NULL, /*  */ .v = NULL, /*  */ .sw = NULL, /*   */ .expected_ret = WANBEIYU_EINVAL},
@@ -54,30 +48,6 @@ int test_touchscreen_init(void)
     {
         wanbeiyu_error_t actual_ret = wanbeiyu_touchscreen_init(case_.ts, (wanbeiyu_rdac_t *)case_.h, (wanbeiyu_rdac_t *)case_.v, (wanbeiyu_spst_switch_t *)case_.sw);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
-        if (actual_ret != WANBEIYU_OK)
-        {
-            continue;
-        }
-
-        test_rdac_state_t actual_h_state = case_.h->state;
-        test_rdac_state_t actual_v_state = case_.v->state;
-        test_switch_state_t actual_sw_state = case_.sw->state;
-
-        if (actual_h_state != TEST_RDAC_POWER_OFF ||
-            actual_v_state != TEST_RDAC_POWER_OFF ||
-            actual_sw_state != TEST_SWITCH_OFF)
-        {
-            fprintf(stderr, "%sindex: %d,\n"
-                            "  expected_h_state: %d, actual_h_state: %d,\n"
-                            "  expected_v_state: %d, actual_v_state: %d,\n"
-                            "  expected_sw_state: %d, actual_sw_state: %d%s\n",
-                    TEXT_RED, i,
-                    TEST_RDAC_POWER_OFF, actual_h_state,
-                    TEST_RDAC_POWER_OFF, actual_v_state,
-                    TEST_SWITCH_OFF, actual_sw_state,
-                    TEXT_RESET);
-            cnt++;
-        }
     }
 
     return cnt;
@@ -93,67 +63,55 @@ int test_touchscreen_hold(void)
         uint16_t x;
         uint8_t y;
 
-        test_rdac_state_t expected_h_state;
+        wanbeiyu_error_t expected_ret;
         uint16_t expected_h_position;
-        test_rdac_state_t expected_v_state;
         uint16_t expected_v_position;
         test_switch_state_t expected_sw_state;
     } test_case_t;
 
-    test_case_t cases[] = {{.x = WANBEIYU_TOUCHSCREEN_X_MIN, .y = WANBEIYU_TOUCHSCREEN_Y_MIN, .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = 0, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = 0, .expected_sw_state = TEST_SWITCH_ON},
-                           {.x = 160, /*                  */ .y = 120, /*                  */ .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = TEST_UINT16_MID, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = TEST_UINT16_MID, .expected_sw_state = TEST_SWITCH_ON},
-                           {.x = WANBEIYU_TOUCHSCREEN_X_MAX, .y = WANBEIYU_TOUCHSCREEN_Y_MAX, .expected_h_state = TEST_RDAC_POWER_ON, .expected_h_position = UINT16_MAX, .expected_v_state = TEST_RDAC_POWER_ON, .expected_v_position = UINT16_MAX, .expected_sw_state = TEST_SWITCH_ON},
-                           {.x = 320, /*                  */ .y = 0, /*                    */ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF},
-                           {.x = 0, /*                    */ .y = 240, /*                  */ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF},
-                           {.x = 320, /*                  */ .y = 240, /*                  */ .expected_h_state = TEST_RDAC_POWER_OFF, .expected_v_state = TEST_RDAC_POWER_OFF, .expected_sw_state = TEST_SWITCH_OFF}};
-
-    wanbeiyu_touchscreen_t *ts_null = NULL;
-    wanbeiyu_touchscreen_hold(ts_null, 0, 0); /* Expected that nothing will happen. */
+    test_case_t cases[] = {{.x = 0, /*                    */ .y = 0, /*                    */ .expected_ret = WANBEIYU_OK, .expected_h_position = 0, /*         */ .expected_v_position = 0, /*         */ .expected_sw_state = TEST_SWITCH_ON},
+                           {.x = 160, /*                  */ .y = 120, /*                  */ .expected_ret = WANBEIYU_OK, .expected_h_position = TEST_UINT16_MID, .expected_v_position = TEST_UINT16_MID, .expected_sw_state = TEST_SWITCH_ON},
+                           {.x = WANBEIYU_TOUCHSCREEN_X_MAX, .y = WANBEIYU_TOUCHSCREEN_Y_MAX, .expected_ret = WANBEIYU_OK, .expected_h_position = UINT16_MAX, /**/ .expected_v_position = UINT16_MAX, /**/ .expected_sw_state = TEST_SWITCH_ON},
+                           {.x = 320, /*                  */ .y = 0, /*                    */ .expected_ret = WANBEIYU_EINVAL},
+                           {.x = 0, /*                    */ .y = 240, /*                  */ .expected_ret = WANBEIYU_EINVAL},
+                           {.x = 320, /*                  */ .y = 240, /*                  */ .expected_ret = WANBEIYU_EINVAL}};
 
     TEST_FOR(cases)
     {
-        test_rdac_t h;
-        test_rdac_init(&h);
-        test_rdac_t v;
-        test_rdac_init(&v);
-        test_switch_t sw;
-        test_switch_init(&sw);
+        wanbeiyu_touchscreen_t *ts_null = NULL;
+        wanbeiyu_error_t actual_ret = wanbeiyu_touchscreen_hold(ts_null, case_.x, case_.y);
+        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
+
         wanbeiyu_touchscreen_t ts;
+        test_rdac_t h;
+        test_rdac_t v;
+        test_switch_t sw;
+        test_rdac_init(&h);
+        test_rdac_init(&v);
+        test_switch_init(&sw);
         assert(wanbeiyu_touchscreen_init(&ts, (wanbeiyu_rdac_t *)&h, (wanbeiyu_rdac_t *)&v, (wanbeiyu_spst_switch_t *)&sw) == WANBEIYU_OK);
 
-        wanbeiyu_touchscreen_hold(&ts, case_.x, case_.y);
+        actual_ret = wanbeiyu_touchscreen_hold(&ts, case_.x, case_.y);
+        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
+        if (actual_ret != WANBEIYU_OK)
+        {
+            continue;
+        }
 
-        test_rdac_state_t actual_h_state = h.state;
-        test_rdac_state_t actual_v_state = v.state;
         test_switch_state_t actual_sw_state = sw.state;
-
-        if (actual_h_state != case_.expected_h_state ||
-            actual_v_state != case_.expected_v_state ||
-            actual_sw_state != case_.expected_sw_state)
+        if (actual_sw_state != case_.expected_sw_state)
         {
             fprintf(stderr, "%sindex: %d,\n"
-                            "  expected_h_state: %d, actual_h_state: %d,\n"
-                            "  expected_v_state: %d, actual_v_state: %d,\n"
-                            "  expected_sw_state: %d, actual_sw_state: %d%s\n",
+                            "  expected_sw_state: %s, actual_sw_state: %s%s\n",
                     TEXT_RED, i,
-                    case_.expected_h_state, actual_h_state,
-                    case_.expected_v_state, actual_v_state,
-                    case_.expected_sw_state, actual_sw_state,
+                    TEST_SWITCH_STATE(case_.expected_sw_state), TEST_SWITCH_STATE(actual_sw_state),
                     TEXT_RESET);
             cnt++;
             continue;
         }
 
-        if (actual_h_state != TEST_RDAC_POWER_ON ||
-            actual_v_state != TEST_RDAC_POWER_ON ||
-            actual_sw_state != TEST_SWITCH_ON)
-        {
-            continue;
-        }
-
         uint16_t actual_h_position = h.position;
         uint16_t actual_v_position = v.position;
-
         if ((h.position < case_.expected_h_position - TEST_RDAC_TOLERANCE && case_.expected_h_position + TEST_RDAC_TOLERANCE < h.position) ||
             (v.position < case_.expected_v_position - TEST_RDAC_TOLERANCE && case_.expected_v_position + TEST_RDAC_TOLERANCE < v.position))
         {
@@ -165,7 +123,6 @@ int test_touchscreen_hold(void)
                     case_.expected_v_position, actual_v_position,
                     TEXT_RESET);
             cnt++;
-            continue;
         }
     }
 
@@ -177,38 +134,46 @@ int test_touchscreen_release(void)
     printf("  * %s\n", __func__);
     int cnt = 0;
 
-    wanbeiyu_touchscreen_t *ts_null = NULL;
-    wanbeiyu_touchscreen_release(ts_null); /* Expected that nothing will happen. */
-
-    test_rdac_t h;
-    test_rdac_init(&h);
-    test_rdac_t v;
-    test_rdac_init(&v);
-    test_switch_t sw;
-    test_switch_init(&sw);
-    wanbeiyu_touchscreen_t ts;
-    assert(wanbeiyu_touchscreen_init(&ts, (wanbeiyu_rdac_t *)&h, (wanbeiyu_rdac_t *)&v, (wanbeiyu_spst_switch_t *)&sw) == WANBEIYU_OK);
-
-    wanbeiyu_touchscreen_release(&ts);
-
-    test_rdac_state_t actual_h_state = h.state;
-    test_rdac_state_t actual_v_state = v.state;
-    test_switch_state_t actual_sw_state = sw.state;
-
-    if (actual_h_state != TEST_RDAC_POWER_OFF ||
-        actual_v_state != TEST_RDAC_POWER_OFF ||
-        actual_sw_state != TEST_SWITCH_OFF)
+    typedef struct test_case_t
     {
-        fprintf(stderr, "%sindex: %d,\n"
-                        "  expected_h_state: %d, actual_h_state: %d,\n"
-                        "  expected_v_state: %d, actual_v_state: %d,\n"
-                        "  expected_sw_state: %d, actual_sw_state: %d%s\n",
-                TEXT_RED, 0,
-                TEST_RDAC_POWER_OFF, actual_h_state,
-                TEST_RDAC_POWER_OFF, actual_v_state,
-                TEST_SWITCH_OFF, actual_sw_state,
-                TEXT_RESET);
-        cnt++;
+        wanbeiyu_error_t expected_ret;
+        test_switch_state_t expected_sw_state;
+    } test_case_t;
+
+    test_case_t cases[] = {{.expected_ret = WANBEIYU_OK, .expected_sw_state = TEST_SWITCH_OFF}};
+
+    TEST_FOR(cases)
+    {
+        wanbeiyu_touchscreen_t *ts_null = NULL;
+        wanbeiyu_error_t actual_ret = wanbeiyu_touchscreen_release(ts_null);
+        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
+
+        wanbeiyu_touchscreen_t ts;
+        test_rdac_t h;
+        test_rdac_t v;
+        test_switch_t sw;
+        test_rdac_init(&h);
+        test_rdac_init(&v);
+        test_switch_init(&sw);
+        assert(wanbeiyu_touchscreen_init(&ts, (wanbeiyu_rdac_t *)&h, (wanbeiyu_rdac_t *)&v, (wanbeiyu_spst_switch_t *)&sw) == WANBEIYU_OK);
+
+        actual_ret = wanbeiyu_touchscreen_release(&ts);
+        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
+        if (actual_ret != WANBEIYU_OK)
+        {
+            continue;
+        }
+
+        test_switch_state_t actual_sw_state = sw.state;
+        if (actual_sw_state != case_.expected_sw_state)
+        {
+            fprintf(stderr, "%sindex: %d,\n"
+                            "  expected_sw_state: %s, actual_sw_state: %s%s\n",
+                    TEXT_RED, i,
+                    TEST_SWITCH_STATE(case_.expected_sw_state), TEST_SWITCH_STATE(actual_sw_state),
+                    TEXT_RESET);
+            cnt++;
+        }
     }
 
     return cnt;

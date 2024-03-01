@@ -54,7 +54,7 @@ int test_button_hold(void)
     {
         wanbeiyu_button_t *btn_null = NULL;
         wanbeiyu_error_t actual_ret = wanbeiyu_button_hold(btn_null);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_PRE_RET(WANBEIYU_EINVAL, actual_ret);
+        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
 
         wanbeiyu_button_t btn;
         test_gpio_t gpio;
@@ -97,7 +97,7 @@ int test_button_release(void)
     {
         wanbeiyu_button_t *btn_null = NULL;
         wanbeiyu_error_t actual_ret = wanbeiyu_button_release(btn_null);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_PRE_RET(WANBEIYU_EINVAL, actual_ret);
+        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
 
         wanbeiyu_button_t btn;
         test_gpio_t gpio;

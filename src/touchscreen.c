@@ -3,24 +3,24 @@
 
 #include <assert.h>
 
-WanbeiyuError wanbeiyu_touchscreen_init(WanbeiyuTouchscreen *ts, WanbeiyuRDAC *h, WanbeiyuRDAC *v, WanbeiyuSPSTSwitch *sw)
+WanbeiyuErrNo wanbeiyu_touchscreen_init(WanbeiyuTouchscreen *ts, WanbeiyuRDAC *horizontal, WanbeiyuRDAC *vertical, WanbeiyuSPSTSwitch *switch_)
 {
     if (ts == NULL ||
-        h == NULL ||
-        v == NULL ||
-        sw == NULL)
+        horizontal == NULL ||
+        vertical == NULL ||
+        switch_ == NULL)
     {
         return WANBEIYU_EINVAL;
     }
 
-    ts->h_ = h;
-    ts->v_ = v;
-    ts->sw_ = sw;
+    ts->horizontal = horizontal;
+    ts->vertical = vertical;
+    ts->switch_ = switch_;
 
     return WANBEIYU_OK;
 }
 
-WanbeiyuError wanbeiyu_touchscreen_hold(WanbeiyuTouchscreen *ts, uint16_t x, uint8_t y)
+WanbeiyuErrNo wanbeiyu_touchscreen_hold(WanbeiyuTouchscreen *ts, uint16_t x, uint8_t y)
 {
     if (ts == NULL ||
         WANBEIYU_TOUCHSCREEN_X_MAX < x ||
@@ -28,16 +28,16 @@ WanbeiyuError wanbeiyu_touchscreen_hold(WanbeiyuTouchscreen *ts, uint16_t x, uin
     {
         return WANBEIYU_EINVAL;
     }
-    assert(ts->h_ != NULL &&
-           ts->v_ != NULL &&
-           ts->sw_ != NULL);
+    assert(ts->horizontal != NULL &&
+           ts->vertical != NULL &&
+           ts->switch_ != NULL);
 
-    WanbeiyuError h_ret = ts->h_->set_wiper_position(ts->h_, (uint16_t)wanbeiyu_internal_remap(x, 0, WANBEIYU_TOUCHSCREEN_X_MAX, 0, UINT16_MAX));
-    WanbeiyuError v_ret = ts->v_->set_wiper_position(ts->v_, (uint16_t)wanbeiyu_internal_remap(y, 0, WANBEIYU_TOUCHSCREEN_Y_MAX, 0, UINT16_MAX));
-    WanbeiyuError sw_ret = ts->sw_->on(ts->sw_);
-    if (h_ret != WANBEIYU_OK ||
-        v_ret != WANBEIYU_OK ||
-        sw_ret != WANBEIYU_OK)
+    WanbeiyuErrNo horizontal_ret = ts->horizontal->set_wiper_position(ts->horizontal, (uint16_t)wanbeiyu_internal_remap(x, 0, WANBEIYU_TOUCHSCREEN_X_MAX, 0, UINT16_MAX));
+    WanbeiyuErrNo vertical_ret = ts->vertical->set_wiper_position(ts->vertical, (uint16_t)wanbeiyu_internal_remap(y, 0, WANBEIYU_TOUCHSCREEN_Y_MAX, 0, UINT16_MAX));
+    WanbeiyuErrNo switch_ret = ts->switch_->on(ts->switch_);
+    if (horizontal_ret != WANBEIYU_OK ||
+        vertical_ret != WANBEIYU_OK ||
+        switch_ret != WANBEIYU_OK)
     {
         return WANBEIYU_EIO;
     }
@@ -45,15 +45,15 @@ WanbeiyuError wanbeiyu_touchscreen_hold(WanbeiyuTouchscreen *ts, uint16_t x, uin
     return WANBEIYU_OK;
 }
 
-WanbeiyuError wanbeiyu_touchscreen_release(WanbeiyuTouchscreen *ts)
+WanbeiyuErrNo wanbeiyu_touchscreen_release(WanbeiyuTouchscreen *ts)
 {
     if (ts == NULL)
     {
         return WANBEIYU_EINVAL;
     }
-    assert(ts->sw_ != NULL);
+    assert(ts->switch_ != NULL);
 
-    WanbeiyuError ret = ts->sw_->off(ts->sw_);
+    WanbeiyuErrNo ret = ts->switch_->off(ts->switch_);
     if (ret != WANBEIYU_OK)
     {
         return WANBEIYU_EIO;

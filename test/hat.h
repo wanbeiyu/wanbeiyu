@@ -20,7 +20,7 @@ int test_hat_init(void)
         WanbeiyuGPIO *down;
         WanbeiyuGPIO *left;
 
-        WanbeiyuError expected_ret;
+        WanbeiyuErrNo expected_ret;
     } TestCase;
 
     WanbeiyuHat hat[32];
@@ -64,7 +64,7 @@ int test_hat_init(void)
 
     TEST_FOR(cases)
     {
-        WanbeiyuError actual_ret = wanbeiyu_hat_init(case_.hat, case_.up, case_.right, case_.down, case_.left);
+        WanbeiyuErrNo actual_ret = wanbeiyu_hat_init(case_.hat, case_.up, case_.right, case_.down, case_.left);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
     }
 
@@ -80,7 +80,7 @@ int test_hat_hold(void)
     {
         WanbeiyuHatDirection dir;
 
-        WanbeiyuError expected_ret;
+        WanbeiyuErrNo expected_ret;
         TestGPIOState expected_up_state;
         TestGPIOState expected_right_state;
         TestGPIOState expected_down_state;
@@ -103,7 +103,7 @@ int test_hat_hold(void)
     TEST_FOR(cases)
     {
         WanbeiyuHat *hat_null = NULL;
-        WanbeiyuError actual_ret = wanbeiyu_hat_hold(hat_null, case_.dir);
+        WanbeiyuErrNo actual_ret = wanbeiyu_hat_hold(hat_null, case_.dir);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
 
         WanbeiyuHat hat;
@@ -143,7 +143,7 @@ int test_hat_release(void)
 
     typedef struct TestCase
     {
-        WanbeiyuError expected_ret;
+        WanbeiyuErrNo expected_ret;
         TestGPIOState expected_up_state;
         TestGPIOState expected_right_state;
         TestGPIOState expected_down_state;
@@ -155,7 +155,7 @@ int test_hat_release(void)
     TEST_FOR(cases)
     {
         WanbeiyuHat *hat_null = NULL;
-        WanbeiyuError actual_ret = wanbeiyu_hat_release(hat_null);
+        WanbeiyuErrNo actual_ret = wanbeiyu_hat_release(hat_null);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
 
         WanbeiyuHat hat;

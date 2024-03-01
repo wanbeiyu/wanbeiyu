@@ -2,7 +2,7 @@
 
 #include <assert.h>
 
-WanbeiyuError wanbeiyu_button_init(WanbeiyuButton *btn, WanbeiyuGPIO *gpio)
+WanbeiyuErrNo wanbeiyu_button_init(WanbeiyuButton *btn, WanbeiyuGPIO *gpio)
 {
     if (btn == NULL ||
         gpio == NULL)
@@ -10,20 +10,20 @@ WanbeiyuError wanbeiyu_button_init(WanbeiyuButton *btn, WanbeiyuGPIO *gpio)
         return WANBEIYU_EINVAL;
     }
 
-    btn->gpio_ = gpio;
+    btn->gpio = gpio;
 
     return WANBEIYU_OK;
 }
 
-WanbeiyuError wanbeiyu_button_hold(WanbeiyuButton *btn)
+WanbeiyuErrNo wanbeiyu_button_hold(WanbeiyuButton *btn)
 {
     if (btn == NULL)
     {
         return WANBEIYU_EINVAL;
     }
-    assert(btn->gpio_ != NULL);
+    assert(btn->gpio != NULL);
 
-    WanbeiyuError ret = btn->gpio_->set_low(btn->gpio_);
+    WanbeiyuErrNo ret = btn->gpio->set_low(btn->gpio);
     if (ret != WANBEIYU_OK)
     {
         return WANBEIYU_EIO;
@@ -32,15 +32,15 @@ WanbeiyuError wanbeiyu_button_hold(WanbeiyuButton *btn)
     return WANBEIYU_OK;
 }
 
-WanbeiyuError wanbeiyu_button_release(WanbeiyuButton *btn)
+WanbeiyuErrNo wanbeiyu_button_release(WanbeiyuButton *btn)
 {
     if (btn == NULL)
     {
         return WANBEIYU_EINVAL;
     }
-    assert(btn->gpio_ != NULL);
+    assert(btn->gpio != NULL);
 
-    WanbeiyuError ret = btn->gpio_->set_hi_z(btn->gpio_);
+    WanbeiyuErrNo ret = btn->gpio->set_hi_z(btn->gpio);
     if (ret != WANBEIYU_OK)
     {
         return WANBEIYU_EIO;

@@ -17,7 +17,7 @@ int test_button_init(void)
         WanbeiyuButton *btn;
         WanbeiyuGPIO *gpio;
 
-        WanbeiyuError expected_ret;
+        WanbeiyuErrNo expected_ret;
     } TestCase;
 
     WanbeiyuButton btn[4];
@@ -30,7 +30,7 @@ int test_button_init(void)
 
     TEST_FOR(cases)
     {
-        WanbeiyuError actual_ret = wanbeiyu_button_init(case_.btn, (WanbeiyuGPIO *)case_.gpio);
+        WanbeiyuErrNo actual_ret = wanbeiyu_button_init(case_.btn, (WanbeiyuGPIO *)case_.gpio);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
     }
 
@@ -44,7 +44,7 @@ int test_button_hold(void)
 
     typedef struct TestCase
     {
-        WanbeiyuError expected_ret;
+        WanbeiyuErrNo expected_ret;
         TestGPIOState expected_state;
     } TestCase;
 
@@ -53,7 +53,7 @@ int test_button_hold(void)
     TEST_FOR(cases)
     {
         WanbeiyuButton *btn_null = NULL;
-        WanbeiyuError actual_ret = wanbeiyu_button_hold(btn_null);
+        WanbeiyuErrNo actual_ret = wanbeiyu_button_hold(btn_null);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
 
         WanbeiyuButton btn;
@@ -87,7 +87,7 @@ int test_button_release(void)
 
     typedef struct TestCase
     {
-        WanbeiyuError expected_ret;
+        WanbeiyuErrNo expected_ret;
         TestGPIOState expected_state;
     } TestCase;
 
@@ -96,7 +96,7 @@ int test_button_release(void)
     TEST_FOR(cases)
     {
         WanbeiyuButton *btn_null = NULL;
-        WanbeiyuError actual_ret = wanbeiyu_button_release(btn_null);
+        WanbeiyuErrNo actual_ret = wanbeiyu_button_release(btn_null);
         TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
 
         WanbeiyuButton btn;

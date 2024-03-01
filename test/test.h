@@ -45,13 +45,13 @@ typedef struct TestGPIO
     TestGPIOState state;
 } TestGPIO;
 
-WanbeiyuError test_gpio_set_low(WanbeiyuGPIO *gpio)
+WanbeiyuErrNo test_gpio_set_low(WanbeiyuGPIO *gpio)
 {
     ((TestGPIO *)gpio)->state = TEST_GPIO_LOW;
     return WANBEIYU_OK;
 }
 
-WanbeiyuError test_gpio_set_hi_z(WanbeiyuGPIO *gpio)
+WanbeiyuErrNo test_gpio_set_hi_z(WanbeiyuGPIO *gpio)
 {
     ((TestGPIO *)gpio)->state = TEST_GPIO_HI_Z;
     return WANBEIYU_OK;
@@ -80,14 +80,14 @@ typedef struct TestIDAC
     uint8_t value;
 } TestIDAC;
 
-WanbeiyuError test_idac_set_sink(WanbeiyuIDAC *idac, uint8_t val)
+WanbeiyuErrNo test_idac_set_sink(WanbeiyuIDAC *idac, uint8_t val)
 {
     ((TestIDAC *)idac)->state = TEST_IDAC_SINK;
     ((TestIDAC *)idac)->value = val;
     return WANBEIYU_OK;
 }
 
-WanbeiyuError test_idac_set_source(WanbeiyuIDAC *idac, uint8_t val)
+WanbeiyuErrNo test_idac_set_source(WanbeiyuIDAC *idac, uint8_t val)
 {
     ((TestIDAC *)idac)->state = TEST_IDAC_SOURCE;
     ((TestIDAC *)idac)->value = val;
@@ -105,7 +105,7 @@ typedef struct TestRDAC
     uint16_t position;
 } TestRDAC;
 
-WanbeiyuError test_digipot_set_wiper_position(WanbeiyuRDAC *rdac, uint16_t pos)
+WanbeiyuErrNo test_digipot_set_wiper_position(WanbeiyuRDAC *rdac, uint16_t pos)
 {
     ((TestRDAC *)rdac)->position = pos;
     return WANBEIYU_OK;
@@ -133,13 +133,13 @@ typedef struct TestSwitch
     TestSwitchState state;
 } TestSwitch;
 
-WanbeiyuError test_switch_on(WanbeiyuSPSTSwitch *sw)
+WanbeiyuErrNo test_switch_on(WanbeiyuSPSTSwitch *sw)
 {
     ((TestSwitch *)sw)->state = TEST_SWITCH_ON;
     return WANBEIYU_OK;
 }
 
-WanbeiyuError test_switch_off(WanbeiyuSPSTSwitch *sw)
+WanbeiyuErrNo test_switch_off(WanbeiyuSPSTSwitch *sw)
 {
     ((TestSwitch *)sw)->state = TEST_SWITCH_OFF;
     return WANBEIYU_OK;

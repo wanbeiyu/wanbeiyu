@@ -1,7 +1,7 @@
-#ifndef TEST_SLIDEPAD_H_
-#define TEST_SLIDEPAD_H_
+#ifndef TEST_SLIDEPAD_H
+#define TEST_SLIDEPAD_H
 
-#include <wanbeiyu.h>
+#include <wanbeiyu/slidepad.h>
 #include "test.h"
 
 #include <assert.h>
@@ -9,181 +9,152 @@
 
 int test_slidepad_init(void)
 {
-    printf("  * %s\n", __func__);
-    int cnt = 0;
-
     typedef struct TestCase
     {
         WanbeiyuSlidepad *sp;
         WanbeiyuIDAC *horizontal;
         WanbeiyuIDAC *vertical;
 
-        WanbeiyuErrNo expected_ret;
+        errno_t expected_err;
     } TestCase;
 
     WanbeiyuSlidepad sp[8];
     WanbeiyuIDAC horizontal[8];
     WanbeiyuIDAC vertical[8];
 
-    TestCase cases[] = {{.sp = NULL, /*  */ .horizontal = NULL, /*          */ .vertical = NULL, /*        */ .expected_ret = WANBEIYU_EINVAL},
-                        {.sp = &sp[1], /**/ .horizontal = NULL, /*          */ .vertical = NULL, /*        */ .expected_ret = WANBEIYU_EINVAL},
-                        {.sp = NULL, /*  */ .horizontal = &horizontal[2], /**/ .vertical = NULL, /*        */ .expected_ret = WANBEIYU_EINVAL},
-                        {.sp = &sp[3], /**/ .horizontal = &horizontal[3], /**/ .vertical = NULL, /*        */ .expected_ret = WANBEIYU_EINVAL},
-                        {.sp = NULL, /*  */ .horizontal = NULL, /*          */ .vertical = &vertical[4], /**/ .expected_ret = WANBEIYU_EINVAL},
-                        {.sp = &sp[5], /**/ .horizontal = NULL, /*          */ .vertical = &vertical[5], /**/ .expected_ret = WANBEIYU_EINVAL},
-                        {.sp = NULL, /*  */ .horizontal = &horizontal[6], /**/ .vertical = &vertical[6], /**/ .expected_ret = WANBEIYU_EINVAL},
-                        {.sp = &sp[7], /**/ .horizontal = &horizontal[7], /**/ .vertical = &vertical[7], /**/ .expected_ret = WANBEIYU_OK}};
+    TestCase TEST_CASES[] = {{.sp = NULL, /*  */ .horizontal = NULL, /*          */ .vertical = NULL, /*        */ .expected_err = EINVAL},
+                             {.sp = &sp[1], /**/ .horizontal = NULL, /*          */ .vertical = NULL, /*        */ .expected_err = EINVAL},
+                             {.sp = NULL, /*  */ .horizontal = &horizontal[2], /**/ .vertical = NULL, /*        */ .expected_err = EINVAL},
+                             {.sp = &sp[3], /**/ .horizontal = &horizontal[3], /**/ .vertical = NULL, /*        */ .expected_err = EINVAL},
+                             {.sp = NULL, /*  */ .horizontal = NULL, /*          */ .vertical = &vertical[4], /**/ .expected_err = EINVAL},
+                             {.sp = &sp[5], /**/ .horizontal = NULL, /*          */ .vertical = &vertical[5], /**/ .expected_err = EINVAL},
+                             {.sp = NULL, /*  */ .horizontal = &horizontal[6], /**/ .vertical = &vertical[6], /**/ .expected_err = EINVAL},
+                             {.sp = &sp[7], /**/ .horizontal = &horizontal[7], /**/ .vertical = &vertical[7], /**/ .expected_err = 0}};
 
-    TEST_FOR(cases)
+    TEST_FOR(TEST_CASES)
     {
-        WanbeiyuErrNo actual_ret = wanbeiyu_slidepad_init(case_.sp, (WanbeiyuIDAC *)case_.horizontal, (WanbeiyuIDAC *)case_.vertical);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
+        errno_t actual_err = wanbeiyu_slidepad_init(TEST_CASE->sp, (WanbeiyuIDAC *)TEST_CASE->horizontal, (WanbeiyuIDAC *)TEST_CASE->vertical);
+        TEST_ASSERT_EQUAL_ERRNO_T(TEST_CASE->expected_err, actual_err);
     }
 
-    return cnt;
+    return TEST_COUNT;
 }
 
 int test_slidepad_hold(void)
 {
-    printf("  * %s\n", __func__);
-    int cnt = 0;
-
     typedef struct TestCase
     {
+        WanbeiyuSlidepad *sp;
         uint8_t x;
         uint8_t y;
 
-        WanbeiyuErrNo expected_ret;
+        errno_t expected_err;
         TestIDACState expected_horizontal_state;
         uint8_t expected_horizontal_value;
         TestIDACState expected_vertical_state;
         uint8_t expected_vertical_value;
     } TestCase;
 
-    TestCase cases[] = {{.x = WANBEIYU_SLIDEPAD_AXIS_NEUTRAL, .y = WANBEIYU_SLIDEPAD_AXIS_NEUTRAL, .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SOURCE, /**/ .expected_horizontal_value = 0, /*   */ .expected_vertical_state = TEST_IDAC_SOURCE, /**/ .expected_vertical_value = 0},
-                        {.x = 0, /*                        */ .y = 0, /*                        */ .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SOURCE, /**/ .expected_horizontal_value = UINT8_MAX, .expected_vertical_state = TEST_IDAC_SOURCE, /**/ .expected_vertical_value = UINT8_MAX},
-                        {.x = UINT8_MAX, /*                */ .y = UINT8_MAX, /*                */ .expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SINK, /*  */ .expected_horizontal_value = UINT8_MAX, .expected_vertical_state = TEST_IDAC_SINK, /*  */ .expected_vertical_value = UINT8_MAX}};
-
-    TEST_FOR(cases)
+    WanbeiyuSlidepad sp[4];
+    TestIDAC horizontal[4];
+    TestIDAC vertical[4];
+    for (size_t i = 0; i < 4; i++)
     {
-        WanbeiyuSlidepad *sp_null = NULL;
-        WanbeiyuErrNo actual_ret = wanbeiyu_slidepad_hold(sp_null, case_.x, case_.y);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
+        test_idac_init(&horizontal[i]);
+        test_idac_init(&vertical[i]);
+        assert(wanbeiyu_slidepad_init(&sp[i], (WanbeiyuIDAC *)&horizontal[i], (WanbeiyuIDAC *)&vertical[i]) == 0);
+    }
 
-        WanbeiyuSlidepad sp;
-        TestIDAC horizontal;
-        TestIDAC vertical;
-        test_idac_init(&horizontal);
-        test_idac_init(&vertical);
-        assert(wanbeiyu_slidepad_init(&sp, (WanbeiyuIDAC *)&horizontal, (WanbeiyuIDAC *)&vertical) == WANBEIYU_OK);
+    TestCase TEST_CASES[] = {{.sp = NULL, /*  */ .x = 0, /*                        */ .y = 0, /*                        */ .expected_err = EINVAL},
+                             {.sp = &sp[1], /**/ .x = WANBEIYU_SLIDEPAD_AXIS_NEUTRAL, .y = WANBEIYU_SLIDEPAD_AXIS_NEUTRAL, .expected_err = 0, .expected_horizontal_state = TEST_IDAC_SOURCE, /**/ .expected_horizontal_value = 0, /*   */ .expected_vertical_state = TEST_IDAC_SOURCE, /**/ .expected_vertical_value = 0},
+                             {.sp = &sp[2], /**/ .x = 0, /*                        */ .y = 0, /*                        */ .expected_err = 0, .expected_horizontal_state = TEST_IDAC_SOURCE, /**/ .expected_horizontal_value = UINT8_MAX, .expected_vertical_state = TEST_IDAC_SOURCE, /**/ .expected_vertical_value = UINT8_MAX},
+                             {.sp = &sp[3], /**/ .x = UINT8_MAX, /*                */ .y = UINT8_MAX, /*                */ .expected_err = 0, .expected_horizontal_state = TEST_IDAC_SINK, /*  */ .expected_horizontal_value = UINT8_MAX, .expected_vertical_state = TEST_IDAC_SINK, /*  */ .expected_vertical_value = UINT8_MAX}};
 
-        actual_ret = wanbeiyu_slidepad_hold(&sp, case_.x, case_.y);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
-        if (actual_ret != WANBEIYU_OK)
+    TEST_FOR(TEST_CASES)
+    {
+        errno_t actual_err = wanbeiyu_slidepad_hold(TEST_CASE->sp, TEST_CASE->x, TEST_CASE->y);
+        TEST_ASSERT_EQUAL_ERRNO_T(TEST_CASE->expected_err, actual_err);
+        if (actual_err != 0)
         {
             continue;
         }
 
-        TestIDACState actual_horizontal_state = horizontal.state;
-        uint8_t actual_horizontal_value = horizontal.value;
-        TestIDACState actual_vertical_state = vertical.state;
-        uint8_t actual_vertical_value = vertical.value;
-        if (actual_horizontal_state != case_.expected_horizontal_state ||
-            actual_horizontal_value != case_.expected_horizontal_value ||
-            actual_vertical_state != case_.expected_vertical_state ||
-            actual_vertical_value != case_.expected_vertical_value)
-        {
-            fprintf(stderr, "%sindex: %d,\n"
-                            "  expected_horizontal_state: %s, actual_horizontal_state: %s,\n"
-                            "  expected_horizontal_value: %d, actual_horizontal_value: %d,\n"
-                            "  expected_vertical_state: %s, actual_vertical_state: %s,\n"
-                            "  expected_vertical_value: %d, actual_vertical_value: %d%s\n",
-                    TEXT_RED, i,
-                    TEST_IDAC_STATE(case_.expected_horizontal_state), TEST_IDAC_STATE(actual_horizontal_state),
-                    case_.expected_horizontal_value, actual_horizontal_value,
-                    TEST_IDAC_STATE(case_.expected_vertical_state), TEST_IDAC_STATE(actual_vertical_state),
-                    case_.expected_vertical_value, actual_vertical_value,
-                    TEXT_RESET);
-            cnt++;
-        }
+        TestIDACState actual_horizontal_state = horizontal[TEST_INDEX].state;
+        TEST_ASSERT_EQUAL_TEST_IDAC_STATE(TEST_CASE->expected_horizontal_state, actual_horizontal_state);
+
+        uint8_t actual_horizontal_value = horizontal[TEST_INDEX].value;
+        TEST_ASSERT_EQUAL_INT(TEST_CASE->expected_horizontal_value, actual_horizontal_value);
+
+        TestIDACState actual_vertical_state = vertical[TEST_INDEX].state;
+        TEST_ASSERT_EQUAL_TEST_IDAC_STATE(TEST_CASE->expected_horizontal_state, actual_horizontal_state);
+
+        uint8_t actual_vertical_value = vertical[TEST_INDEX].value;
+        TEST_ASSERT_EQUAL_INT(TEST_CASE->expected_horizontal_value, actual_horizontal_value);
     }
 
-    return cnt;
+    return TEST_COUNT;
 }
 
 int test_slidepad_release(void)
 {
-    printf("  * %s\n", __func__);
-    int cnt = 0;
-
     typedef struct TestCase
     {
-        WanbeiyuErrNo expected_ret;
+        WanbeiyuSlidepad *sp;
+
+        errno_t expected_err;
         TestIDACState expected_horizontal_state;
         uint8_t expected_horizontal_value;
         TestIDACState expected_vertical_state;
         uint8_t expected_vertical_value;
     } TestCase;
 
-    TestCase cases[] = {{.expected_ret = WANBEIYU_OK, .expected_horizontal_state = TEST_IDAC_SOURCE, .expected_horizontal_value = 0, .expected_vertical_state = TEST_IDAC_SOURCE, .expected_vertical_value = 0}};
-
-    TEST_FOR(cases)
+    WanbeiyuSlidepad sp[2];
+    TestIDAC horizontal[2];
+    TestIDAC vertical[2];
+    for (size_t i = 0; i < 2; i++)
     {
-        WanbeiyuSlidepad *sp_null = NULL;
-        WanbeiyuErrNo actual_ret = wanbeiyu_slidepad_release(sp_null);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
+        test_idac_init(&horizontal[i]);
+        test_idac_init(&vertical[i]);
+        assert(wanbeiyu_slidepad_init(&sp[i], (WanbeiyuIDAC *)&horizontal[i], (WanbeiyuIDAC *)&vertical[i]) == 0);
+    }
 
-        WanbeiyuSlidepad sp;
-        TestIDAC horizontal;
-        TestIDAC vertical;
-        test_idac_init(&horizontal);
-        test_idac_init(&vertical);
-        assert(wanbeiyu_slidepad_init(&sp, (WanbeiyuIDAC *)&horizontal, (WanbeiyuIDAC *)&vertical) == WANBEIYU_OK);
+    TestCase TEST_CASES[] = {{.sp = NULL, /*  */ .expected_err = EINVAL},
+                             {.sp = &sp[1], /**/ .expected_err = 0, .expected_horizontal_state = TEST_IDAC_SOURCE, .expected_horizontal_value = 0, .expected_vertical_state = TEST_IDAC_SOURCE, .expected_vertical_value = 0}};
 
-        actual_ret = wanbeiyu_slidepad_release(&sp);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
-        if (actual_ret != WANBEIYU_OK)
+    TEST_FOR(TEST_CASES)
+    {
+        errno_t actual_err = wanbeiyu_slidepad_release(TEST_CASE->sp);
+        TEST_ASSERT_EQUAL_ERRNO_T(TEST_CASE->expected_err, actual_err);
+        if (actual_err != 0)
         {
             continue;
         }
 
-        TestIDACState actual_horizontal_state = horizontal.state;
-        uint8_t actual_horizontal_value = horizontal.value;
-        TestIDACState actual_vertical_state = vertical.state;
-        uint8_t actual_vertical_value = vertical.value;
-        if (actual_horizontal_state != case_.expected_horizontal_state ||
-            actual_horizontal_value != case_.expected_horizontal_value ||
-            actual_vertical_state != case_.expected_vertical_state ||
-            actual_vertical_value != case_.expected_vertical_value)
-        {
-            fprintf(stderr, "%sindex: %d,\n"
-                            "  expected_horizontal_state: %s, actual_horizontal_state: %s,\n"
-                            "  expected_horizontal_value: %d, actual_horizontal_value: %d,\n"
-                            "  expected_vertical_state: %s, actual_vertical_state: %s,\n"
-                            "  expected_vertical_value: %d, actual_vertical_value: %d%s\n",
-                    TEXT_RED, i,
-                    TEST_IDAC_STATE(case_.expected_horizontal_state), TEST_IDAC_STATE(actual_horizontal_state),
-                    case_.expected_horizontal_value, actual_horizontal_value,
-                    TEST_IDAC_STATE(case_.expected_vertical_state), TEST_IDAC_STATE(actual_vertical_state),
-                    case_.expected_vertical_value, actual_vertical_value,
-                    TEXT_RESET);
-            cnt++;
-        }
+        TestIDACState actual_horizontal_state = horizontal[TEST_INDEX].state;
+        TEST_ASSERT_EQUAL_TEST_IDAC_STATE(TEST_CASE->expected_horizontal_state, actual_horizontal_state);
+
+        uint8_t actual_horizontal_value = horizontal[TEST_INDEX].value;
+        TEST_ASSERT_EQUAL_INT(TEST_CASE->expected_horizontal_value, actual_horizontal_value);
+
+        TestIDACState actual_vertical_state = vertical[TEST_INDEX].state;
+        TEST_ASSERT_EQUAL_TEST_IDAC_STATE(TEST_CASE->expected_horizontal_state, actual_horizontal_state);
+
+        uint8_t actual_vertical_value = vertical[TEST_INDEX].value;
+        TEST_ASSERT_EQUAL_INT(TEST_CASE->expected_horizontal_value, actual_horizontal_value);
     }
 
-    return cnt;
+    return TEST_COUNT;
 }
 
 int test_slidepad(void)
 {
-    printf("* %s\n", __func__);
-    int cnt = 0;
+    int count = 0;
 
-    cnt += test_slidepad_init();
-    cnt += test_slidepad_hold();
-    cnt += test_slidepad_release();
+    count += test_slidepad_init();
+    count += test_slidepad_hold();
+    count += test_slidepad_release();
 
-    return cnt;
+    return count;
 }
 
-#endif // TEST_SLIDEPAD_H_
+#endif // TEST_SLIDEPAD_H

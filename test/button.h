@@ -1,7 +1,7 @@
-#ifndef TEST_BUTTON_H_
-#define TEST_BUTTON_H_
+#ifndef TEST_BUTTON_H
+#define TEST_BUTTON_H
 
-#include <wanbeiyu.h>
+#include <wanbeiyu/button.h>
 #include "test.h"
 
 #include <assert.h>
@@ -9,130 +9,109 @@
 
 int test_button_init(void)
 {
-    printf("  * %s\n", __func__);
-    int cnt = 0;
-
     typedef struct TestCase
     {
         WanbeiyuButton *btn;
         WanbeiyuGPIO *gpio;
 
-        WanbeiyuErrNo expected_ret;
+        errno_t expected_err;
     } TestCase;
 
     WanbeiyuButton btn[4];
     WanbeiyuGPIO gpio[4];
 
-    TestCase cases[] = {{.btn = NULL, /*   */ .gpio = NULL, /*    */ .expected_ret = WANBEIYU_EINVAL},
-                        {.btn = &btn[1], /**/ .gpio = NULL, /*    */ .expected_ret = WANBEIYU_EINVAL},
-                        {.btn = NULL, /*   */ .gpio = &gpio[2], /**/ .expected_ret = WANBEIYU_EINVAL},
-                        {.btn = &btn[3], /**/ .gpio = &gpio[3], /**/ .expected_ret = WANBEIYU_OK}};
+    TestCase TEST_CASES[] = {{.btn = NULL, /*   */ .gpio = NULL, /*    */ .expected_err = EINVAL},
+                             {.btn = &btn[1], /**/ .gpio = NULL, /*    */ .expected_err = EINVAL},
+                             {.btn = NULL, /*   */ .gpio = &gpio[2], /**/ .expected_err = EINVAL},
+                             {.btn = &btn[3], /**/ .gpio = &gpio[3], /**/ .expected_err = 0}};
 
-    TEST_FOR(cases)
+    TEST_FOR(TEST_CASES)
     {
-        WanbeiyuErrNo actual_ret = wanbeiyu_button_init(case_.btn, (WanbeiyuGPIO *)case_.gpio);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
+        errno_t actual_err = wanbeiyu_button_init(TEST_CASE->btn, (WanbeiyuGPIO *)TEST_CASE->gpio);
+        TEST_ASSERT_EQUAL_ERRNO_T(TEST_CASE->expected_err, actual_err);
     }
 
-    return cnt;
+    return TEST_COUNT;
 }
 
 int test_button_hold(void)
 {
-    printf("  * %s\n", __func__);
-    int cnt = 0;
-
     typedef struct TestCase
     {
-        WanbeiyuErrNo expected_ret;
+        WanbeiyuButton *btn;
+
+        errno_t expected_err;
         TestGPIOState expected_state;
     } TestCase;
 
-    TestCase cases[] = {{.expected_ret = WANBEIYU_OK, .expected_state = TEST_GPIO_LOW}};
+    TestGPIO gpio[2];
+    WanbeiyuButton btn[2];
+    test_gpio_init(&gpio[1]);
+    assert(wanbeiyu_button_init(&btn[1], (WanbeiyuGPIO *)&gpio[1]) == 0);
 
-    TEST_FOR(cases)
+    TestCase TEST_CASES[] = {{.btn = NULL, /*   */ .expected_err = EINVAL},
+                             {.btn = &btn[1], /**/ .expected_err = 0, .expected_state = TEST_GPIO_LOW}};
+
+    TEST_FOR(TEST_CASES)
     {
-        WanbeiyuButton *btn_null = NULL;
-        WanbeiyuErrNo actual_ret = wanbeiyu_button_hold(btn_null);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
-
-        WanbeiyuButton btn;
-        TestGPIO gpio;
-        test_gpio_init(&gpio);
-        assert(wanbeiyu_button_init(&btn, (WanbeiyuGPIO *)&gpio) == WANBEIYU_OK);
-
-        actual_ret = wanbeiyu_button_hold(&btn);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
-        if (actual_ret != WANBEIYU_OK)
+        errno_t actual_err = wanbeiyu_button_hold(TEST_CASE->btn);
+        TEST_ASSERT_EQUAL_ERRNO_T(TEST_CASE->expected_err, actual_err);
+        if (actual_err != 0)
         {
             continue;
         }
 
-        TestGPIOState actual_state = gpio.state;
-        if (case_.expected_state != actual_state)
-        {
-            fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n",
-                    TEXT_RED, i, TEST_GPIO_STATE(TEST_GPIO_LOW), TEST_GPIO_STATE(actual_state), TEXT_RESET);
-            cnt++;
-        }
+        TestGPIOState actual_state = gpio[TEST_INDEX].state;
+        TEST_ASSERT_EQUAL_TEST_GPIO_STATE(TEST_CASE->expected_state, actual_state);
     }
 
-    return cnt;
+    return TEST_COUNT;
 }
 
 int test_button_release(void)
 {
-    printf("  * %s\n", __func__);
-    int cnt = 0;
-
     typedef struct TestCase
     {
-        WanbeiyuErrNo expected_ret;
+        WanbeiyuButton *btn;
+
+        errno_t expected_err;
         TestGPIOState expected_state;
     } TestCase;
 
-    TestCase cases[] = {{.expected_ret = WANBEIYU_OK, .expected_state = TEST_GPIO_HI_Z}};
+    TestGPIO gpio[2];
+    WanbeiyuButton btn[2];
 
-    TEST_FOR(cases)
+    test_gpio_init(&gpio[1]);
+    assert(wanbeiyu_button_init(&btn[1], (WanbeiyuGPIO *)&gpio[1]) == 0);
+
+    TestCase TEST_CASES[] = {{.btn = NULL, /*   */ .expected_err = EINVAL},
+                             {.btn = &btn[1], /**/ .expected_err = 0, .expected_state = TEST_GPIO_HI_Z}};
+
+    TEST_FOR(TEST_CASES)
     {
-        WanbeiyuButton *btn_null = NULL;
-        WanbeiyuErrNo actual_ret = wanbeiyu_button_release(btn_null);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(WANBEIYU_EINVAL, actual_ret);
-
-        WanbeiyuButton btn;
-        TestGPIO gpio;
-        test_gpio_init(&gpio);
-        assert(wanbeiyu_button_init(&btn, (WanbeiyuGPIO *)&gpio) == WANBEIYU_OK);
-
-        actual_ret = wanbeiyu_button_release(&btn);
-        TEST_ASSERT_EQUAL_WANBEIYU_ERROR_RET(case_.expected_ret, actual_ret);
-        if (actual_ret != WANBEIYU_OK)
+        errno_t actual_err = wanbeiyu_button_release(TEST_CASE->btn);
+        TEST_ASSERT_EQUAL_ERRNO_T(TEST_CASE->expected_err, actual_err);
+        if (actual_err != 0)
         {
             continue;
         }
 
-        TestGPIOState actual_state = gpio.state;
-        if (case_.expected_state != actual_state)
-        {
-            fprintf(stderr, "%sindex: %d, expected_state: %d, actual_state: %d%s\n",
-                    TEXT_RED, i, TEST_GPIO_STATE(TEST_GPIO_LOW), TEST_GPIO_STATE(actual_state), TEXT_RESET);
-            cnt++;
-        }
+        TestGPIOState actual_state = gpio[TEST_INDEX].state;
+        TEST_ASSERT_EQUAL_TEST_GPIO_STATE(TEST_CASE->expected_state, actual_state);
     }
 
-    return cnt;
+    return TEST_COUNT;
 }
 
 int test_button(void)
 {
-    printf("* %s\n", __func__);
-    int cnt = 0;
+    int count = 0;
 
-    cnt += test_button_init();
-    cnt += test_button_hold();
-    cnt += test_button_release();
+    count += test_button_init();
+    count += test_button_hold();
+    count += test_button_release();
 
-    return cnt;
+    return count;
 }
 
-#endif // TEST_BUTTON_H_
+#endif // TEST_BUTTON_H

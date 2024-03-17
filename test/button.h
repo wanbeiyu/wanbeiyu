@@ -80,7 +80,6 @@ int test_button_release(void)
 
     TestGPIO gpio[2];
     WanbeiyuButton btn[2];
-
     test_gpio_init(&gpio[1]);
     assert(wanbeiyu_button_init(&btn[1], (WanbeiyuGPIO *)&gpio[1]) == 0);
 

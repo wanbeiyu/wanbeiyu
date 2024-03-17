@@ -23,7 +23,7 @@ errno_t wanbeiyu_button_hold(WanbeiyuButton *btn)
     }
     assert(btn->gpio != NULL);
 
-    errno_t err = btn->gpio->set_low(btn->gpio);
+    errno_t err = wanbeiyu_gpio_set_low(btn->gpio);
     if (err != 0)
     {
         return EIO;
@@ -40,7 +40,7 @@ errno_t wanbeiyu_button_release(WanbeiyuButton *btn)
     }
     assert(btn->gpio != NULL);
 
-    errno_t err = btn->gpio->set_hi_z(btn->gpio);
+    errno_t err = wanbeiyu_gpio_set_hi_z(btn->gpio);
     if (err != 0)
     {
         return EIO;

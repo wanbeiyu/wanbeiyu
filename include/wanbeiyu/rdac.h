@@ -22,6 +22,8 @@ extern "C"
         errno_t (*set_wiper_position)(struct WanbeiyuRDAC *, uint16_t);
     } WanbeiyuRDAC;
 
+    errno_t wanbeiyu_rdac_set_wiper_position(WanbeiyuRDAC *, uint16_t);
+
 #ifdef __cplusplus
 }
 #endif

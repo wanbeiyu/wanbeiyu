@@ -22,6 +22,9 @@ extern "C"
         errno_t (*set_hi_z)(struct WanbeiyuGPIO *);
     } WanbeiyuGPIO;
 
+    errno_t wanbeiyu_gpio_set_low(WanbeiyuGPIO *);
+    errno_t wanbeiyu_gpio_set_hi_z(WanbeiyuGPIO *);
+
 #ifdef __cplusplus
 }
 #endif

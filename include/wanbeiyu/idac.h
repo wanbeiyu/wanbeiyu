@@ -23,6 +23,9 @@ extern "C"
         errno_t (*set_source)(struct WanbeiyuIDAC *, uint8_t);
     } WanbeiyuIDAC;
 
+    errno_t wanbeiyu_idac_set_sink(WanbeiyuIDAC *, uint8_t);
+    errno_t wanbeiyu_idac_set_source(WanbeiyuIDAC *, uint8_t);
+
 #ifdef __cplusplus
 }
 #endif

@@ -34,17 +34,17 @@ errno_t wanbeiyu_hat_hold(WanbeiyuHat *hat, WanbeiyuHatDirection dir)
            hat->left != NULL);
 
     errno_t up_err = dir & WANBEIYU_HAT_UP
-                         ? hat->up->set_low(hat->up)
-                         : hat->up->set_hi_z(hat->up);
+                         ? wanbeiyu_gpio_set_low(hat->up)
+                         : wanbeiyu_gpio_set_hi_z(hat->up);
     errno_t right_err = dir & WANBEIYU_HAT_RIGHT
-                            ? hat->right->set_low(hat->right)
-                            : hat->right->set_hi_z(hat->right);
+                            ? wanbeiyu_gpio_set_low(hat->right)
+                            : wanbeiyu_gpio_set_hi_z(hat->right);
     errno_t down_err = dir & WANBEIYU_HAT_DOWN
-                           ? hat->down->set_low(hat->down)
-                           : hat->down->set_hi_z(hat->down);
+                           ? wanbeiyu_gpio_set_low(hat->down)
+                           : wanbeiyu_gpio_set_hi_z(hat->down);
     errno_t left_err = dir & WANBEIYU_HAT_LEFT
-                           ? hat->left->set_low(hat->left)
-                           : hat->left->set_hi_z(hat->left);
+                           ? wanbeiyu_gpio_set_low(hat->left)
+                           : wanbeiyu_gpio_set_hi_z(hat->left);
     if (up_err != 0 ||
         right_err != 0 ||
         down_err != 0 ||

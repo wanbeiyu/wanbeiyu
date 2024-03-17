@@ -32,9 +32,9 @@ errno_t wanbeiyu_touchscreen_hold(WanbeiyuTouchscreen *ts, uint16_t x, uint8_t y
            ts->vertical != NULL &&
            ts->switch_ != NULL);
 
-    errno_t horizontal_err = ts->horizontal->set_wiper_position(ts->horizontal, (uint16_t)wanbeiyu_internal_remap(x, 0, WANBEIYU_TOUCHSCREEN_X_MAX, 0, UINT16_MAX));
-    errno_t vertical_err = ts->vertical->set_wiper_position(ts->vertical, (uint16_t)wanbeiyu_internal_remap(y, 0, WANBEIYU_TOUCHSCREEN_Y_MAX, 0, UINT16_MAX));
-    errno_t switch_err = ts->switch_->on(ts->switch_);
+    errno_t horizontal_err = wanbeiyu_rdac_set_wiper_position(ts->horizontal, (uint16_t)wanbeiyu_internal_remap(x, 0, WANBEIYU_TOUCHSCREEN_X_MAX, 0, UINT16_MAX));
+    errno_t vertical_err = wanbeiyu_rdac_set_wiper_position(ts->vertical, (uint16_t)wanbeiyu_internal_remap(y, 0, WANBEIYU_TOUCHSCREEN_Y_MAX, 0, UINT16_MAX));
+    errno_t switch_err = wanbeiyu_spst_switch_on(ts->switch_);
     if (horizontal_err != 0 ||
         vertical_err != 0 ||
         switch_err != 0)
@@ -53,7 +53,7 @@ errno_t wanbeiyu_touchscreen_release(WanbeiyuTouchscreen *ts)
     }
     assert(ts->switch_ != NULL);
 
-    errno_t err = ts->switch_->off(ts->switch_);
+    errno_t err = wanbeiyu_spst_switch_off(ts->switch_);
     if (err != 0)
     {
         return EIO;

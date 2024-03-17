@@ -22,6 +22,9 @@ extern "C"
         errno_t (*off)(struct WanbeiyuSPSTSwitch *);
     } WanbeiyuSPSTSwitch;
 
+    errno_t wanbeiyu_spst_switch_on(WanbeiyuSPSTSwitch *);
+    errno_t wanbeiyu_spst_switch_off(WanbeiyuSPSTSwitch *);
+
 #ifdef __cplusplus
 }
 #endif

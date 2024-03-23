@@ -1,5 +1,5 @@
-#ifndef WANBEIYU_INTERNAL_H_
-#define WANBEIYU_INTERNAL_H_
+#ifndef WANBEIYU_INTERNAL_H
+#define WANBEIYU_INTERNAL_H
 
 #ifdef __cplusplus
 extern "C"
@@ -15,4 +15,4 @@ extern "C"
 }
 #endif
 
-#endif // WANBEIYU_INTERNAL_H_
+#endif // WANBEIYU_INTERNAL_H
